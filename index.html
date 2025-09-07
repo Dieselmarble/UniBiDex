@@ -16,18 +16,21 @@
 
         <!-- Title and Authors -->
         <div class="title-section">
-            <h1 class="project-title">UniBiDex: Universal Bimanual Dexterous Manipulation</h1>
+            <h1 class="project-title">UniBiDex: A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation</h1>
             <div class="authors">
-                <a href="#" class="author">Author Name1*</a>
-                <a href="#" class="author">Author Name2*</a>
-                <a href="#" class="author">Author Name3</a>
-                <a href="#" class="author">Author Name4</a>
-                <a href="#" class="author">Author Name5</a>
+                <a href="#" class="author">Zhongxuan Li*</a>
+                <a href="#" class="author">Zeliang Guo*</a>
+                <a href="#" class="author">Jun Hu</a>
+                <a href="#" class="author">David Navarro-Alarcon</a>
+                <a href="#" class="author">Jia Pan</a>
+                <a href="#" class="author">Hongmin Wu†</a>
+                <a href="#" class="author">Peng Zhou†</a>
             </div>
             <div class="affiliation">
-                University/Institution Names
+                The University of Hong Kong, The Great Bay University, <br>
+                The Hong Kong Polytechnic University, Guangdong Academy of Sciences
             </div>
-            <div class="contribution-note">* Equal contribution</div>
+            <div class="contribution-note">* Equal contribution, † Corresponding author</div>
             <div class="links">
                 <a href="#" class="link-button">Paper</a>
                 <a href="videos/teaser.pdf" class="link-button" target="_blank">Teaser</a>
@@ -51,17 +54,13 @@
             <h2 class="section-title">Abstract</h2>
             <div class="section-content">
                 <p>
-                    UniBiDex presents a novel approach to universal bimanual dexterous manipulation that enables 
-                    robots to perform complex tasks requiring coordination between two hands. Our system integrates 
-                    advanced vision-based control with haptic feedback to achieve precise manipulation capabilities 
-                    across a wide range of tasks. Through innovative design of the control architecture and extensive 
-                    experimental validation, UniBiDex demonstrates superior performance in bimanual manipulation 
-                    scenarios compared to existing approaches.
+                    We present <strong>UniBiDex</strong>, a unified teleoperation framework for robotic bimanual dexterous manipulation that supports both VR-based and leader–follower input modalities. UniBiDex enables real-time, contact-rich dual-arm teleoperation by integrating heterogeneous input devices into a shared control stack with consistent kinematic treatment and safety guarantees.
                 </p>
                 <p>
-                    The system's ability to handle diverse manipulation tasks while maintaining real-time performance 
-                    makes it a powerful tool for advancing dexterous manipulation and robotic applications in 
-                    unstructured environments.
+                    The framework employs null-space control to optimize bimanual configurations, ensuring smooth, collision-free and singularity-aware motion across tasks. We validate UniBiDex on a long-horizon kitchen-tidying task involving five sequential manipulation subtasks, demonstrating higher task success rates, smoother trajectories, and improved robustness compared to strong baselines.
+                </p>
+                <p>
+                    By releasing all hardware and software components as open-source, we aim to lower the barrier to collecting large-scale, high-quality human demonstration datasets and accelerate progress in robot learning.
                 </p>
             </div>
         </section>
@@ -78,9 +77,28 @@
                     <p class="video-caption">UniBiDex system demonstration showing bimanual dexterous manipulation capabilities</p>
                 </div>
                 <p>
-                    UniBiDex employs a modular architecture that separates perception, planning, and control 
-                    components to ensure scalability and adaptability across different robotic platforms.
+                    The proposed system supports two teleoperation input modalities: VR headsets and leader–follower arms. For the VR mode, we use the Meta Quest 3, while the leader–follower mode is based on the hardware design of the GELLO system. A unified dual-arm control layer minimizes collisions and inverse-kinematics failures in both modes, enabling precise and reliable bimanual manipulation.
                 </p>
+                
+                <h3 class="subsection-title">Framework Architecture</h3>
+                <p>
+                    The overall architecture consists of four decoupled modules: <em>input preprocessing</em>, <em>motion retargeting</em>, <em>bimanual motion control</em>, and <em>haptic feedback</em>. The input preprocessing module receives target end-effector poses and converts them into the robot base frame, filtering raw input to ensure stable downstream control.
+                </p>
+                <p>
+                    The motion retargeting module translates input poses into joint configurations via inverse kinematics. For leader–follower arms, although joint angles are directly observed, inverse kinematics is still applied to identify and correct potentially invalid configurations such as self-collisions or singularities.
+                </p>
+                
+                <h3 class="subsection-title">Bimanual Motion Control</h3>
+                <p>
+                    The bimanual motion control module computes the final joint commands by optimizing the configurations of both arms. We employ null-space control to exploit the redundancy of dual 7-DoF arms, enabling secondary objectives such as maintaining safe inter-arm distances and maximizing manipulability.
+                </p>
+                <div class="math-formula">
+                    <p>For each arm <em>i</em>, we solve the optimization problem:</p>
+                    <div class="formula-box">
+                        Δ<strong>q</strong><sub>i</sub> = arg min<sub>Δ<strong>q</strong></sub> (||J<sub>i</sub> Δ<strong>q</strong> - <strong>e</strong><sub>i</sub><sup>cart</sup>||² + ω<sub>q</sub> ||Δ<strong>q</strong> - Δ<strong>q</strong><sub>C<sub>i</sub></sub>||² + μ² ||Δ<strong>q</strong>||²)
+                    </div>
+                    <p>where the three terms represent Cartesian tracking, joint matching, and damping respectively.</p>
+                </div>
             </div>
         </section>
 
@@ -118,23 +136,33 @@
         <section class="section">
             <h2 class="section-title">Technical Innovation</h2>
             <div class="section-content">
-                <h3 class="subsection-title">Advanced Control Architecture</h3>
+                <h3 class="subsection-title">Unified Control Architecture</h3>
                 <div class="media-placeholder">
-                    <p>Control System Diagram - Placeholder for technical diagrams</p>
+                    <p>Control System Architecture Diagram - Placeholder for technical diagrams</p>
                 </div>
                 <p>
-                    The control architecture incorporates real-time feedback mechanisms and adaptive algorithms 
-                    to ensure robust performance across varying conditions and tasks.
+                    The framework integrates heterogeneous input devices into a shared control stack with consistent kinematic treatment. The name "UniBiDex" reflects two core principles: <strong>universal device support</strong> (any input modality can be integrated) and <strong>unified constraint handling</strong> (all safety and task-related constraints are enforced through a single bimanual control module).
                 </p>
 
-                <h3 class="subsection-title">Vision-Based Perception</h3>
-                <div class="media-placeholder">
-                    <p>Vision System Components - Placeholder for technical content</p>
-                </div>
+                <h3 class="subsection-title">Null-Space Control for Bimanual Coordination</h3>
                 <p>
-                    Our vision system provides accurate real-time perception of object states and environmental 
-                    conditions, enabling precise manipulation planning and execution.
+                    We define a set of optimal bimanual configurations Ω<sub>ref</sub> that capture preferred dual-arm configurations for specific tasks. The system employs null-space control to exploit the redundancy of dual 7-DoF arms, enabling secondary objectives such as maintaining safe inter-arm distances and maximizing manipulability.
                 </p>
+                <div class="math-formula">
+                    <p>The null-space increment for each arm <em>i</em> is computed as:</p>
+                    <div class="formula-box">
+                        Δq<sub>i,null</sub> = k<sub>n</sub> (I - J<sub>i</sub><sup>†</sup> J<sub>i</sub>) (q<sub>i</sub><sup>*</sup> - q<sub>i</sub>)
+                    </div>
+                    <p>where J<sub>i</sub><sup>†</sup> is the pseudoinverse of the arm Jacobian and k<sub>n</sub> > 0 is the scalar gain.</p>
+                </div>
+
+                <h3 class="subsection-title">Haptic Feedback System</h3>
+                <p>
+                    Both kinesthetic and vibrotactile feedback are generated using joint current measurements from the follower arm. By subtracting precomputed gravity torques, the system isolates net interaction torques caused by contact or payload. This approach infers external interaction forces directly from joint motor currents, enabling a cost-effective solution applicable to low-cost robotic arms without built-in force sensing.
+                </p>
+                <div class="media-placeholder">
+                    <p>Haptic Feedback Implementation Details - Placeholder for technical content</p>
+                </div>
             </div>
         </section>
 
@@ -142,30 +170,68 @@
         <section class="section">
             <h2 class="section-title">Experimental Results</h2>
             <div class="section-content">
-                <h3 class="subsection-title">Performance Evaluation</h3>
-                <div class="media-placeholder">
-                    <p>Performance Charts and Graphs - Placeholder for results visualization</p>
+                <h3 class="subsection-title">Kitchen-Tidying Task</h3>
+                <p>
+                    We conducted a comprehensive user study with four participants performing a long-horizon bimanual manipulation task simulating a household kitchen-tidying routine. The task involves five sequential, contact-rich sub-tasks requiring dexterous coordination:
+                </p>
+                <ol>
+                    <li><strong>Item Unpacking:</strong> Pick up assorted items from a cloth bag and place them on the table</li>
+                    <li><strong>Shelf Organization:</strong> Sort and place items into designated positions in a multi-level kitchen shelf</li>
+                    <li><strong>Towel Folding:</strong> Fold the towel neatly along a marked midline using both grippers</li>
+                    <li><strong>Towel Placement:</strong> Place the folded towel onto the rack section of the shelf</li>
+                    <li><strong>Clamp Attachment:</strong> Attach the clamp onto the rack to secure the towel in place</li>
+                </ol>
+
+                <h3 class="subsection-title">Performance Comparison</h3>
+                <div class="results-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Overall Success Rate</th>
+                                <th>Completion Time (s)</th>
+                                <th>Improvement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>UniBiDex (VR)</strong></td>
+                                <td>60% (24/40)</td>
+                                <td>672 ± 20</td>
+                                <td>+15% success, -18% time</td>
+                            </tr>
+                            <tr>
+                                <td>Naive VR Baseline</td>
+                                <td>45% (18/40)</td>
+                                <td>816 ± 24</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>UniBiDex (Leader-Follower)</strong></td>
+                                <td>75% (30/40)</td>
+                                <td>319 ± 8</td>
+                                <td>+18% success, -5% time</td>
+                            </tr>
+                            <tr>
+                                <td>Naive LF Baseline</td>
+                                <td>57% (24/40)</td>
+                                <td>335 ± 9</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <h3 class="subsection-title">Comparison with Baselines</h3>
-                <div class="comparison-grid">
-                    <div class="comparison-item">
-                        <h4>Task Success Rate</h4>
-                        <div class="media-placeholder">
-                            <p>Success Rate Comparison - Placeholder</p>
-                        </div>
-                    </div>
-                    <div class="comparison-item">
-                        <h4>Execution Time</h4>
-                        <div class="media-placeholder">
-                            <p>Time Performance - Placeholder</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 class="subsection-title">Key Findings</h3>
+                <p>
+                    Our unified framework delivered markedly more consistent performance across the entire manipulation sequence compared to both VR-only and leader–follower baselines. The integration of null-space guided configuration optimization helped mitigate abrupt joint updates and enabled more stable arm behavior, particularly during fine manipulation stages.
+                </p>
+                <p>
+                    Baseline VR control suffered from erratic end-effector trajectories when recovering from large Cartesian errors, and occasionally stalled near kinematic singularities. The leader–follower baseline, while more stable in free space, also suffered from reachability issues due to suboptimal joint configurations.
+                </p>
 
-                <h3 class="subsection-title">Robustness Analysis</h3>
                 <div class="media-placeholder">
-                    <p>Robustness Testing Results - Placeholder for analysis content</p>
+                    <p>Detailed Performance Analysis Charts - Placeholder for additional result visualizations</p>
                 </div>
             </div>
         </section>
@@ -201,21 +267,15 @@
             <h2 class="section-title">Citation</h2>
             <div class="section-content">
                 <div class="citation-box">
-                    <pre><code>@article{unibidex,
-    title   = {UniBiDex: Universal Bimanual Dexterous Manipulation},
-    author  = {Author Names},
-    year    = {2024},
-    journal = {Conference/Journal Name},
+                    <pre><code>@article{li2025unibidex,
+    title   = {UniBiDex: A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation},
+    author  = {Zhongxuan Li and Zeliang Guo and Jun Hu and David Navarro-Alarcon and Jia Pan and Hongmin Wu and Peng Zhou},
+    year    = {2025},
+    journal = {2025 IEEE International Conference on Robotics and Biomimetics (IEEE ROBIO 2025)},
+    note    = {Under Review},
     url     = {https://github.com/Dieselmarble/UniBiDex}
 }</code></pre>
                 </div>
-            </div>
-        </section>
-
-        <!-- Contact -->
-        <section class="section">
-            <div class="contact">
-                <p>If you have any questions, please feel free to contact <a href="#" class="contact-link">the authors</a>.</p>
             </div>
         </section>
     </div>

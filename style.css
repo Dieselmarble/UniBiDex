@@ -185,6 +185,80 @@ body {
     text-align: center;
 }
 
+/* Math formulas */
+.math-formula {
+    margin: 25px 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #0066cc;
+}
+
+.formula-box {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 15px 0;
+    font-family: 'Times New Roman', serif;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #2a2a2a;
+}
+
+/* Results table */
+.results-table {
+    margin: 25px 0;
+    overflow-x: auto;
+}
+
+.results-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results-table th,
+.results-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.results-table th {
+    background-color: #0066cc;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.results-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.results-table td:last-child {
+    font-weight: 500;
+    color: #0066cc;
+}
+
+/* Ordered list styling */
+.section-content ol {
+    margin: 20px 0;
+    padding-left: 25px;
+}
+
+.section-content ol li {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.section-content ol li strong {
+    color: #0066cc;
+}
+
 /* Comparison grid */
 .comparison-grid {
     display: grid;
@@ -320,6 +394,20 @@ body {
     .video-caption {
         font-size: 0.9rem;
         margin-top: 8px;
+    }
+
+    .results-table {
+        font-size: 0.9rem;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 8px 10px;
+    }
+
+    .formula-box {
+        font-size: 1rem;
+        padding: 12px;
     }
 }
 
