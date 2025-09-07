@@ -25,12 +25,6 @@ body {
     margin-bottom: 40px;
 }
 
-.project-logo {
-    max-width: 200px;
-    height: auto;
-    margin-bottom: 20px;
-}
-
 /* Title section */
 .title-section {
     text-align: center;
@@ -67,6 +61,11 @@ body {
     font-size: 1.1rem;
     margin-bottom: 10px;
     font-weight: 400;
+}
+
+.affiliation-line {
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 
 .contribution-note {
@@ -204,6 +203,33 @@ body {
     text-align: center;
     font-size: 1.1rem;
     color: #2a2a2a;
+    line-height: 1.6;
+}
+
+/* Figure containers */
+.figure-container {
+    margin: 30px 0;
+    text-align: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.figure-container embed {
+    border: none;
+    display: block;
+}
+
+.figure-caption {
+    padding: 15px 20px;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #666;
+    font-style: italic;
+    text-align: left;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
 }
 
 /* Results table */
@@ -408,6 +434,15 @@ body {
     .formula-box {
         font-size: 1rem;
         padding: 12px;
+    }
+
+    .figure-container embed {
+        height: 400px;
+    }
+
+    .figure-caption {
+        padding: 12px 15px;
+        font-size: 0.9rem;
     }
 }
 

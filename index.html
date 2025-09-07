@@ -9,33 +9,28 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header with project image -->
-        <div class="header">
-            <img src="assets/images/unibidex_logo.svg" alt="UniBiDex" class="project-logo" />
-        </div>
-
         <!-- Title and Authors -->
         <div class="title-section">
             <h1 class="project-title">UniBiDex: A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation</h1>
             <div class="authors">
-                <a href="#" class="author">Zhongxuan Li*</a>
-                <a href="#" class="author">Zeliang Guo*</a>
-                <a href="#" class="author">Jun Hu</a>
-                <a href="#" class="author">David Navarro-Alarcon</a>
-                <a href="#" class="author">Jia Pan</a>
-                <a href="#" class="author">Hongmin Wu†</a>
-                <a href="#" class="author">Peng Zhou†</a>
+                <a href="#" class="author">Zhongxuan Li<sup>1,*</sup></a>
+                <a href="#" class="author">Zeliang Guo<sup>2,*</sup></a>
+                <a href="#" class="author">Jun Hu<sup>2</sup></a>
+                <a href="#" class="author">David Navarro-Alarcon<sup>3</sup></a>
+                <a href="#" class="author">Jia Pan<sup>1</sup></a>
+                <a href="#" class="author">Hongmin Wu<sup>4,†</sup></a>
+                <a href="#" class="author">Peng Zhou<sup>2,†</sup></a>
             </div>
             <div class="affiliation">
-                The University of Hong Kong, The Great Bay University, <br>
-                The Hong Kong Polytechnic University, Guangdong Academy of Sciences
+                <div class="affiliation-line"><sup>1</sup> Department of Computer and Data Science, The University of Hong Kong</div>
+                <div class="affiliation-line"><sup>2</sup> Dongguan Key Laboratory of Intelligent Equipment and Smart Industry, School of Advanced Engineering, The Great Bay University</div>
+                <div class="affiliation-line"><sup>3</sup> Department of Mechanical Engineering, The Hong Kong Polytechnic University</div>
+                <div class="affiliation-line"><sup>4</sup> Guangdong Academy of Sciences</div>
             </div>
             <div class="contribution-note">* Equal contribution, † Corresponding author</div>
             <div class="links">
-                <a href="#" class="link-button">Paper</a>
-                <a href="videos/teaser.pdf" class="link-button" target="_blank">Teaser</a>
-                <a href="#" class="link-button">Code</a>
-                <a href="#" class="link-button">Dataset</a>
+                <a href="assets/papers/paper.pdf" class="link-button" target="_blank">Paper</a>
+                <a href="https://github.com/Dieselmarble/UniBiDex" class="link-button" target="_blank">Code</a>
             </div>
         </div>
 
@@ -69,100 +64,68 @@
         <section class="section">
             <h2 class="section-title">System Overview</h2>
             <div class="section-content">
-                <div class="video-container">
-                    <video controls width="100%" poster="">
-                        <source src="videos/video.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <p class="video-caption">UniBiDex system demonstration showing bimanual dexterous manipulation capabilities</p>
-                </div>
                 <p>
                     The proposed system supports two teleoperation input modalities: VR headsets and leader–follower arms. For the VR mode, we use the Meta Quest 3, while the leader–follower mode is based on the hardware design of the GELLO system. A unified dual-arm control layer minimizes collisions and inverse-kinematics failures in both modes, enabling precise and reliable bimanual manipulation.
                 </p>
                 
                 <h3 class="subsection-title">Framework Architecture</h3>
+                <div class="figure-container">
+                    <img src="assets/images/framework.png" alt="UniBiDex Framework Architecture" style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+                </div>
+                
                 <p>
-                    The overall architecture consists of four decoupled modules: <em>input preprocessing</em>, <em>motion retargeting</em>, <em>bimanual motion control</em>, and <em>haptic feedback</em>. The input preprocessing module receives target end-effector poses and converts them into the robot base frame, filtering raw input to ensure stable downstream control.
+                    The framework integrates heterogeneous input devices into a shared control stack with consistent kinematic treatment. The name "UniBiDex" reflects two core principles: <strong>universal device support</strong> (any input modality can be integrated) and <strong>unified constraint handling</strong> (all safety and task-related constraints are enforced through a single bimanual control module). The overall architecture consists of four decoupled modules: <em>input preprocessing</em>, <em>motion retargeting</em>, <em>bimanual motion control</em>, and <em>haptic feedback</em>.
                 </p>
+
+                <h3 class="subsection-title">Motion Retargeting and Safety-Aware Control</h3>
                 <p>
-                    The motion retargeting module translates input poses into joint configurations via inverse kinematics. For leader–follower arms, although joint angles are directly observed, inverse kinematics is still applied to identify and correct potentially invalid configurations such as self-collisions or singularities.
+                    To integrate heterogeneous input devices, we define a <em>virtual base frame</em> at the user's initial input pose. All subsequent teleoperation commands are expressed relative to this frame and then retargeted to the robot:
                 </p>
                 
-                <h3 class="subsection-title">Bimanual Motion Control</h3>
-                <p>
-                    The bimanual motion control module computes the final joint commands by optimizing the configurations of both arms. We employ null-space control to exploit the redundancy of dual 7-DoF arms, enabling secondary objectives such as maintaining safe inter-arm distances and maximizing manipulability.
-                </p>
                 <div class="math-formula">
-                    <p>For each arm <em>i</em>, we solve the optimization problem:</p>
                     <div class="formula-box">
-                        Δ<strong>q</strong><sub>i</sub> = arg min<sub>Δ<strong>q</strong></sub> (||J<sub>i</sub> Δ<strong>q</strong> - <strong>e</strong><sub>i</sub><sup>cart</sup>||² + ω<sub>q</sub> ||Δ<strong>q</strong> - Δ<strong>q</strong><sub>C<sub>i</sub></sub>||² + μ² ||Δ<strong>q</strong>||²)
+                        <sup>V</sup>ΔT<sub>C<sub>i</sub></sub>(t) = (<sup>V</sup>T<sub>C<sub>i</sub></sub><sup>0</sup>)<sup>-1</sup> <sup>V</sup>T<sub>C<sub>i</sub></sub>(t)
+                    </div>
+                    <div class="formula-box">
+                        <sup>R</sup>T<sub>E<sub>i</sub></sub><sup>des</sup>(t) = <sup>V</sup>ΔT<sub>C<sub>i</sub></sub>(t) <sup>R</sup>T<sub>E<sub>i</sub></sub><sup>0</sup>
+                    </div>
+                </div>
+
+                <p>
+                    For each arm <em>i</em>, we solve a safety-aware inverse kinematics optimization at every control step:
+                </p>
+                
+                <div class="math-formula">
+                    <div class="formula-box">
+                        Δ<strong>q</strong><sub>i</sub> = arg min<sub>Δ<strong>q</strong></sub> (
+                        ||J<sub>i</sub> Δ<strong>q</strong> - <strong>e</strong><sub>i</sub><sup>cart</sup>||² + 
+                        ω<sub>q</sub> ||Δ<strong>q</strong> - Δ<strong>q</strong><sub>C<sub>i</sub></sub>||² + 
+                        μ² ||Δ<strong>q</strong>||²)
                     </div>
                     <p>where the three terms represent Cartesian tracking, joint matching, and damping respectively.</p>
                 </div>
-            </div>
-        </section>
 
-        <!-- Manipulation Tasks -->
-        <section class="section">
-            <h2 class="section-title">Bimanual Manipulation Tasks</h2>
-            <div class="section-content">
+                <h3 class="subsection-title">Null-Space Bimanual Coordination</h3>
                 <p>
-                    Our system demonstrates proficiency across a diverse set of bimanual manipulation tasks, 
-                    showcasing the versatility and robustness of the UniBiDex framework.
+                    We exploit the redundancy of dual 7-DoF arms using null-space control for secondary objectives. The system selects the closest configuration from a set of optimal bimanual configurations Ω<sub>ref</sub>:
                 </p>
                 
-                <h3 class="subsection-title">Coordination Tasks</h3>
-                <div class="video-container">
-                    <video controls width="100%" poster="">
-                        <source src="videos/video.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <p class="video-caption">Demonstration of bimanual coordination tasks requiring precise timing and spatial awareness</p>
-                </div>
-                
-                <h3 class="subsection-title">Precision Manipulation</h3>
-                <div class="media-placeholder">
-                    <p>Precision Manipulation Examples - Placeholder for videos/images</p>
-                </div>
-
-                <h3 class="subsection-title">Dynamic Tasks</h3>
-                <div class="media-placeholder">
-                    <p>Dynamic Manipulation Demonstrations - Placeholder for videos/images</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Technical Innovation -->
-        <section class="section">
-            <h2 class="section-title">Technical Innovation</h2>
-            <div class="section-content">
-                <h3 class="subsection-title">Unified Control Architecture</h3>
-                <div class="media-placeholder">
-                    <p>Control System Architecture Diagram - Placeholder for technical diagrams</p>
-                </div>
-                <p>
-                    The framework integrates heterogeneous input devices into a shared control stack with consistent kinematic treatment. The name "UniBiDex" reflects two core principles: <strong>universal device support</strong> (any input modality can be integrated) and <strong>unified constraint handling</strong> (all safety and task-related constraints are enforced through a single bimanual control module).
-                </p>
-
-                <h3 class="subsection-title">Null-Space Control for Bimanual Coordination</h3>
-                <p>
-                    We define a set of optimal bimanual configurations Ω<sub>ref</sub> that capture preferred dual-arm configurations for specific tasks. The system employs null-space control to exploit the redundancy of dual 7-DoF arms, enabling secondary objectives such as maintaining safe inter-arm distances and maximizing manipulability.
-                </p>
                 <div class="math-formula">
-                    <p>The null-space increment for each arm <em>i</em> is computed as:</p>
+                    <div class="formula-box">
+                        (q<sub>L</sub><sup>*</sup>, q<sub>R</sub><sup>*</sup>) = arg min<sub>(q<sub>L</sub><sup>(k)</sup>, q<sub>R</sub><sup>(k)</sup>) ∈ Ω<sub>ref</sub></sub> ||q<sub>L</sub><sup>(k)</sup> - q<sub>L</sub>||² + ||q<sub>R</sub><sup>(k)</sup> - q<sub>R</sub>||²
+                    </div>
                     <div class="formula-box">
                         Δq<sub>i,null</sub> = k<sub>n</sub> (I - J<sub>i</sub><sup>†</sup> J<sub>i</sub>) (q<sub>i</sub><sup>*</sup> - q<sub>i</sub>)
                     </div>
-                    <p>where J<sub>i</sub><sup>†</sup> is the pseudoinverse of the arm Jacobian and k<sub>n</sub> > 0 is the scalar gain.</p>
+                    <div class="formula-box">
+                        Δq<sub>i</sub> ← Δq<sub>i</sub> + Δq<sub>i,null</sub>
+                    </div>
                 </div>
 
-                <h3 class="subsection-title">Haptic Feedback System</h3>
+                <h3 class="subsection-title">Cost-Effective Haptic Feedback</h3>
                 <p>
-                    Both kinesthetic and vibrotactile feedback are generated using joint current measurements from the follower arm. By subtracting precomputed gravity torques, the system isolates net interaction torques caused by contact or payload. This approach infers external interaction forces directly from joint motor currents, enabling a cost-effective solution applicable to low-cost robotic arms without built-in force sensing.
+                    Both kinesthetic and vibrotactile feedback are generated using joint current measurements. By subtracting precomputed gravity torques, the system isolates net interaction torques caused by contact or payload. This torque is rendered directly on the leader arm and mapped to vibration signals on VR controllers, creating a rich multimodal haptic interface without requiring expensive torque sensors.
                 </p>
-                <div class="media-placeholder">
-                    <p>Haptic Feedback Implementation Details - Placeholder for technical content</p>
-                </div>
             </div>
         </section>
 
@@ -220,44 +183,6 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
-
-                <h3 class="subsection-title">Key Findings</h3>
-                <p>
-                    Our unified framework delivered markedly more consistent performance across the entire manipulation sequence compared to both VR-only and leader–follower baselines. The integration of null-space guided configuration optimization helped mitigate abrupt joint updates and enabled more stable arm behavior, particularly during fine manipulation stages.
-                </p>
-                <p>
-                    Baseline VR control suffered from erratic end-effector trajectories when recovering from large Cartesian errors, and occasionally stalled near kinematic singularities. The leader–follower baseline, while more stable in free space, also suffered from reachability issues due to suboptimal joint configurations.
-                </p>
-
-                <div class="media-placeholder">
-                    <p>Detailed Performance Analysis Charts - Placeholder for additional result visualizations</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Applications -->
-        <section class="section">
-            <h2 class="section-title">Applications</h2>
-            <div class="section-content">
-                <p>
-                    UniBiDex demonstrates versatility across various application domains, from industrial automation 
-                    to service robotics and research applications.
-                </p>
-
-                <h3 class="subsection-title">Industrial Applications</h3>
-                <div class="media-placeholder">
-                    <p>Industrial Use Cases - Placeholder for application videos</p>
-                </div>
-
-                <h3 class="subsection-title">Service Robotics</h3>
-                <div class="media-placeholder">
-                    <p>Service Robot Applications - Placeholder for demonstration content</p>
-                </div>
-
-                <h3 class="subsection-title">Research Applications</h3>
-                <div class="media-placeholder">
-                    <p>Research Scenarios - Placeholder for research content</p>
                 </div>
             </div>
         </section>

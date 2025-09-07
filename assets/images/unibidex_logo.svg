@@ -1,25 +1,109 @@
-<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+<svg width="300" height="120" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Gradients -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#0066cc;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0080ff;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#004499;stop-opacity:1" />
     </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f7931e;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2c3e50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34495e;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Filters for effects -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#00000030"/>
+    </filter>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   
-  <!-- Background -->
-  <rect x="0" y="0" width="200" height="80" fill="none"/>
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="50" fill="url(#primaryGradient)" opacity="0.1" filter="url(#dropShadow)"/>
   
-  <!-- Left hand representation -->
-  <circle cx="50" cy="40" r="15" fill="url(#logoGradient)" opacity="0.8"/>
-  <rect x="45" y="25" width="10" height="30" fill="url(#logoGradient)" opacity="0.6"/>
+  <!-- Left robotic arm representation -->
+  <g transform="translate(20,25)">
+    <!-- Base -->
+    <rect x="15" y="50" width="8" height="15" rx="4" fill="url(#primaryGradient)"/>
+    <!-- Arm segments -->
+    <rect x="10" y="35" width="18" height="4" rx="2" fill="url(#primaryGradient)" transform="rotate(-20 19 37)"/>
+    <rect x="8" y="20" width="16" height="3" rx="1.5" fill="url(#accentGradient)" transform="rotate(-45 16 21.5)"/>
+    <!-- End effector -->
+    <circle cx="12" cy="15" r="3" fill="url(#accentGradient)" filter="url(#glow)"/>
+    <rect x="10" y="12" width="1" height="6" fill="url(#accentGradient)"/>
+    <rect x="13" y="12" width="1" height="6" fill="url(#accentGradient)"/>
+  </g>
   
-  <!-- Right hand representation -->
-  <circle cx="150" cy="40" r="15" fill="url(#logoGradient)" opacity="0.8"/>
-  <rect x="145" y="25" width="10" height="30" fill="url(#logoGradient)" opacity="0.6"/>
+  <!-- Right robotic arm representation -->
+  <g transform="translate(80,25)">
+    <!-- Base -->
+    <rect x="15" y="50" width="8" height="15" rx="4" fill="url(#primaryGradient)"/>
+    <!-- Arm segments -->
+    <rect x="10" y="35" width="18" height="4" rx="2" fill="url(#primaryGradient)" transform="rotate(20 19 37)"/>
+    <rect x="14" y="20" width="16" height="3" rx="1.5" fill="url(#accentGradient)" transform="rotate(45 22 21.5)"/>
+    <!-- End effector -->
+    <circle cx="26" cy="15" r="3" fill="url(#accentGradient)" filter="url(#glow)"/>
+    <rect x="25" y="12" width="1" height="6" fill="url(#accentGradient)"/>
+    <rect x="27" y="12" width="1" height="6" fill="url(#accentGradient)"/>
+  </g>
   
-  <!-- Connection/coordination line -->
-  <line x1="65" y1="40" x2="135" y2="40" stroke="url(#logoGradient)" stroke-width="3" opacity="0.7"/>
+  <!-- Coordination visualization -->
+  <g>
+    <!-- Connection arc -->
+    <path d="M 32 40 Q 60 25 88 40" stroke="url(#accentGradient)" stroke-width="2" fill="none" opacity="0.7" stroke-dasharray="3,2"/>
+    <!-- Central coordination point -->
+    <circle cx="60" cy="32" r="4" fill="url(#accentGradient)" filter="url(#glow)"/>
+    <!-- Coordination lines -->
+    <line x1="32" y1="40" x2="56" y2="32" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="88" y1="40" x2="64" y2="32" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.6"/>
+  </g>
+  
+  <!-- Object being manipulated -->
+  <rect x="55" y="45" width="10" height="8" rx="2" fill="url(#accentGradient)" opacity="0.8" filter="url(#dropShadow)"/>
   
   <!-- Text -->
-  <text x="100" y="70" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="url(#logoGradient)">UniBiDex</text>
+  <g transform="translate(130, 35)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="url(#textGradient)" filter="url(#dropShadow)">
+      <tspan x="0" dy="0">Uni</tspan><tspan fill="url(#accentGradient)">Bi</tspan><tspan fill="url(#primaryGradient)">Dex</tspan>
+    </text>
+    <text x="0" y="25" font-family="Arial, sans-serif" font-size="10" font-weight="normal" fill="#666" opacity="0.8">
+      Unified Bimanual Dexterous Manipulation
+    </text>
+  </g>
+  
+  <!-- Decorative elements -->
+  <g opacity="0.3">
+    <!-- Tech grid pattern -->
+    <defs>
+      <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="url(#primaryGradient)" stroke-width="0.5"/>
+      </pattern>
+    </defs>
+    <rect x="140" y="55" width="40" height="25" fill="url(#grid)" opacity="0.5"/>
+  </g>
+  
+  <!-- Motion indicators -->
+  <g opacity="0.6">
+    <circle cx="32" cy="40" r="1" fill="url(#accentGradient)">
+      <animate attributeName="r" values="1;3;1" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="88" cy="40" r="1" fill="url(#accentGradient)">
+      <animate attributeName="r" values="1;3;1" dur="2s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+  </g>
 </svg>
