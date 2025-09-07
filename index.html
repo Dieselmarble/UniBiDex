@@ -85,9 +85,11 @@
                 <div class="math-formula">
                     <div class="formula-box">
                         <sup>V</sup>ΔT<sub>C<sub>i</sub></sub>(t) = (<sup>V</sup>T<sub>C<sub>i</sub></sub><sup>0</sup>)<sup>-1</sup> <sup>V</sup>T<sub>C<sub>i</sub></sub>(t)
-                    </div>
-                    <div class="formula-box">
+                        <br><br>
                         <sup>R</sup>T<sub>E<sub>i</sub></sub><sup>des</sup>(t) = <sup>V</sup>ΔT<sub>C<sub>i</sub></sub>(t) <sup>R</sup>T<sub>E<sub>i</sub></sub><sup>0</sup>
+                        <div class="formula-explanation">
+                            Motion retargeting: compute relative controller motion and translate to desired robot end-effector pose
+                        </div>
                     </div>
                 </div>
 
@@ -101,8 +103,10 @@
                         ||J<sub>i</sub> Δ<strong>q</strong> - <strong>e</strong><sub>i</sub><sup>cart</sup>||² + 
                         ω<sub>q</sub> ||Δ<strong>q</strong> - Δ<strong>q</strong><sub>C<sub>i</sub></sub>||² + 
                         μ² ||Δ<strong>q</strong>||²)
+                        <div class="formula-explanation">
+                            Three-term optimization: Cartesian tracking + joint matching + damping
+                        </div>
                     </div>
-                    <p>where the three terms represent Cartesian tracking, joint matching, and damping respectively.</p>
                 </div>
 
                 <h3 class="subsection-title">Null-Space Bimanual Coordination</h3>
@@ -113,12 +117,13 @@
                 <div class="math-formula">
                     <div class="formula-box">
                         (q<sub>L</sub><sup>*</sup>, q<sub>R</sub><sup>*</sup>) = arg min<sub>(q<sub>L</sub><sup>(k)</sup>, q<sub>R</sub><sup>(k)</sup>) ∈ Ω<sub>ref</sub></sub> ||q<sub>L</sub><sup>(k)</sup> - q<sub>L</sub>||² + ||q<sub>R</sub><sup>(k)</sup> - q<sub>R</sub>||²
-                    </div>
-                    <div class="formula-box">
+                        <br><br>
                         Δq<sub>i,null</sub> = k<sub>n</sub> (I - J<sub>i</sub><sup>†</sup> J<sub>i</sub>) (q<sub>i</sub><sup>*</sup> - q<sub>i</sub>)
-                    </div>
-                    <div class="formula-box">
+                        <br><br>
                         Δq<sub>i</sub> ← Δq<sub>i</sub> + Δq<sub>i,null</sub>
+                        <div class="formula-explanation">
+                            Complete null-space control: select optimal configuration, compute null-space motion, and combine with primary task
+                        </div>
                     </div>
                 </div>
 
