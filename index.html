@@ -76,61 +76,6 @@
                 <p>
                     The framework integrates heterogeneous input devices into a shared control stack with consistent kinematic treatment. The name "UniBiDex" reflects two core principles: <strong>universal device support</strong> (any input modality can be integrated) and <strong>unified constraint handling</strong> (all safety and task-related constraints are enforced through a single bimanual control module). The overall architecture consists of four decoupled modules: <em>input preprocessing</em>, <em>motion retargeting</em>, <em>bimanual motion control</em>, and <em>haptic feedback</em>.
                 </p>
-
-                <h3 class="subsection-title">Motion Retargeting and Safety-Aware Control</h3>
-                <p>
-                    To integrate heterogeneous input devices, we define a <em>virtual base frame</em> at the user's initial input pose. All subsequent teleoperation commands are expressed relative to this frame and then retargeted to the robot:
-                </p>
-                
-                <div class="math-formula">
-                    <div class="formula-box">
-                        <sup>V</sup>ΔT<sub>C<sub>i</sub></sub>(t) = (<sup>V</sup>T<sub>C<sub>i</sub></sub><sup>0</sup>)<sup>-1</sup> <sup>V</sup>T<sub>C<sub>i</sub></sub>(t)
-                        <br><br>
-                        <sup>R</sup>T<sub>E<sub>i</sub></sub><sup>des</sup>(t) = <sup>V</sup>ΔT<sub>C<sub>i</sub></sub>(t) <sup>R</sup>T<sub>E<sub>i</sub></sub><sup>0</sup>
-                        <div class="formula-explanation">
-                            Motion retargeting: compute relative controller motion and translate to desired robot end-effector pose
-                        </div>
-                    </div>
-                </div>
-
-                <p>
-                    For each arm <em>i</em>, we solve a safety-aware inverse kinematics optimization at every control step:
-                </p>
-                
-                <div class="math-formula">
-                    <div class="formula-box">
-                        Δ<strong>q</strong><sub>i</sub> = arg min<sub>Δ<strong>q</strong></sub> (
-                        ||J<sub>i</sub> Δ<strong>q</strong> - <strong>e</strong><sub>i</sub><sup>cart</sup>||² + 
-                        ω<sub>q</sub> ||Δ<strong>q</strong> - Δ<strong>q</strong><sub>C<sub>i</sub></sub>||² + 
-                        μ² ||Δ<strong>q</strong>||²)
-                        <div class="formula-explanation">
-                            Three-term optimization: Cartesian tracking + joint matching + damping
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="subsection-title">Null-Space Bimanual Coordination</h3>
-                <p>
-                    We exploit the redundancy of dual 7-DoF arms using null-space control for secondary objectives. The system selects the closest configuration from a set of optimal bimanual configurations Ω<sub>ref</sub>:
-                </p>
-                
-                <div class="math-formula">
-                    <div class="formula-box">
-                        (q<sub>L</sub><sup>*</sup>, q<sub>R</sub><sup>*</sup>) = arg min<sub>(q<sub>L</sub><sup>(k)</sup>, q<sub>R</sub><sup>(k)</sup>) ∈ Ω<sub>ref</sub></sub> ||q<sub>L</sub><sup>(k)</sup> - q<sub>L</sub>||² + ||q<sub>R</sub><sup>(k)</sup> - q<sub>R</sub>||²
-                        <br><br>
-                        Δq<sub>i,null</sub> = k<sub>n</sub> (I - J<sub>i</sub><sup>†</sup> J<sub>i</sub>) (q<sub>i</sub><sup>*</sup> - q<sub>i</sub>)
-                        <br><br>
-                        Δq<sub>i</sub> ← Δq<sub>i</sub> + Δq<sub>i,null</sub>
-                        <div class="formula-explanation">
-                            Complete null-space control: select optimal configuration, compute null-space motion, and combine with primary task
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="subsection-title">Cost-Effective Haptic Feedback</h3>
-                <p>
-                    Both kinesthetic and vibrotactile feedback are generated using joint current measurements. By subtracting precomputed gravity torques, the system isolates net interaction torques caused by contact or payload. This torque is rendered directly on the leader arm and mapped to vibration signals on VR controllers, creating a rich multimodal haptic interface without requiring expensive torque sensors.
-                </p>
             </div>
         </section>
 
