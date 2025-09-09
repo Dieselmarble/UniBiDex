@@ -1,16 +1,14 @@
-# 🤖 UniBiDex: Unified Bimanual Dexterous Manipulation
+# 🤖 UniBiDex: A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation
 
 <div align="center">
 
 [![arXiv](https://img.shields.io/badge/arXiv-2501.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2501.XXXXX)
 [![Website](https://img.shields.io/badge/🌐-Website-blue.svg)](https://dieselmarble.github.io/UniBiDex/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-green.svg)](https://docs.ros.org/en/humble/)
 
-*A unified teleoperation framework for robotic bimanual dexterous manipulation*
-
-> **🆕 Latest Updates**: The codebase has been restructured for better modularity and maintainability. Key improvements include unified device management, streamlined configuration, and enhanced simulation support.
+*A unified teleoperation framework for robotic bimanual dexterous manipulation that bridges the gap between human dexterity and robotic precision through intuitive haptic leader-follower control systems*
 
 [**Paper**](https://arxiv.org/abs/2501.XXXXX) | [**Website**](https://dieselmarble.github.io/UniBiDex/) | [**Video**](https://youtu.be/XXXXX) | [**Data**](#datasets)
 
@@ -20,16 +18,18 @@
 
 ## 🔥 Highlights
 
-**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** with haptic leader-follower devices. Our system integrates cost-effective hardware design, advanced control algorithms, and simulation environments to achieve precise, safe, and efficient dual-arm manipulation.
+**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through haptic leader-follower devices. Our system addresses the fundamental challenge of transferring human bimanual dexterity to robotic systems by providing a cost-effective hardware solution, advanced control algorithms, and comprehensive simulation environment for precise, safe, and intuitive dual-arm manipulation.
 
 ### Key Features
 
-- 🎮 **Unified Leader-Follower Control**: Custom-designed UniBiDex devices provide intuitive bimanual teleoperation
-- 🤝 **Bimanual Coordination**: Advanced control framework handles dual-arm manipulation with coordinated motion  
-- 🛡️ **Safety-Aware Control**: Collision avoidance, singularity handling, and workspace limits
-- 🔄 **Null-Space Optimization**: Exploit arm redundancy for optimal bimanual coordination
-- 📱 **Haptic Feedback**: Force feedback using motor current sensing for enhanced immersion
-- 🐳 **Modular Design**: Extensible architecture for different robots and control algorithms
+- 🎮 **Cross-Device Consistency**: Unified data format transformation across heterogeneous input sources (VR, haptic controllers, isomorphic arms)
+- 🛡️ **Motion Smoothness & Safety**: Null-space optimization and redundancy control for robust operation with singularity avoidance
+- 🔬 **Empirical Validation**: Proven performance in complex, long-horizon manipulation tasks like kitchen tidying scenarios
+- 🌐 **Robustness & Generalization**: Unified cross-modal control algorithms for enhanced imitation learning performance
+- 🎯 **Haptic Feedback**: Current-based force feedback providing enhanced manipulation precision
+- 🔧 **Cost-Effective Hardware**: Open-source hardware design using off-the-shelf components for accessibility
+- 🌐 **Comprehensive Simulation**: High-fidelity MuJoCo simulation environment for safe training and validation
+- 🔧 **Modular Design**: Extensible architecture for different robots and control algorithms
 
 ---
 
@@ -38,26 +38,26 @@
 ```
 UniBiDex/
 ├── 🎮 assets/                        # 3D models and calibration files
-│   ├── images/                       # Project images and logos
-│   └── urdf/                         # Robot URDF models
+│   ├── images/                       
+│   └── urdf/                         
 ├── 📜 scripts/                       # Main control scripts
-│   ├── main.py                       # Core teleoperation script
-│   ├── visualize_example.py          # Visualization utilities
-│   └── calib/                        # Calibration scripts and configs
+│   ├── leader_controller.py                       
+│   ├── visualize_example.py          
+│   └── calib/                        # Calibration code for the leader arm
 ├── 🤖 unibidex_core/                 # Core UniBiDex framework
-│   ├── agents/                       # Agent implementations
-│   ├── dynamixel/                    # Dynamixel motor control
-│   └── robots/                       # Robot interface modules
+│   ├── agents/                       
+│   ├── dynamixel/                    
+│   └── robots/                       
 ├── 🎛️ unibidex_client/               # Robot control client
 │   ├── motion_control/               # Motion controllers (XArm7, grippers)
 │   ├── nodes/                        # ROS2 nodes and utilities
-│   ├── configs/                      # Configuration files
-│   └── tests/                        # Test scripts
+│   ├── configs/                      
+│   └── tests/                        
 ├── � sim/                           # Simulation environments
-│   └── envs/                         # MuJoCo simulation environments
+│   └── envs/                         
 └── 🔧 third_party/                   # Third-party dependencies
-    ├── DynamixelSDK/                 # Dynamixel SDK
-    └── mujoco_menagerie/             # MuJoCo robot models
+    ├── DynamixelSDK/                 
+    └── mujoco_menagerie/             
 ```
 
 ---
@@ -66,10 +66,14 @@ UniBiDex/
 
 ### Prerequisites
 
-- **OS**: Ubuntu 20.04/22.04 (recommended)
+- **OS**: Ubuntu 22.04 (recommended)
 - **Python**: ≥ 3.8
-- **Hardware**: XArm7 robots, UniBiDex leader devices, Robotiq grippers (optional)
-- **Dependencies**: Modern C++ compiler, OpenCV, NumPy
+- **Hardware**: 
+  - **Follower**: Dual XArm7 robotic arms (UFactory)
+  - **Leader**: Custom UniBiDex haptic devices with Dynamixel servos
+  - **Grippers**: Robotiq 2F-85 grippers (optional but recommended)
+  - **Cameras**: Multi-view RGB cameras for visual feedback
+- **Dependencies**: ROS2 Humble, MuJoCo ≥ 3.0, OpenCV, NumPy, Dynamixel SDK
 
 ### Basic Setup
 
@@ -77,7 +81,7 @@ UniBiDex/
    ```bash
    git clone --recursive https://github.com/Dieselmarble/UniBiDex.git
    cd UniBiDex
-   conda create -n unibidex python=3.8
+   conda create -n unibidex python=3.10
    conda activate unibidex
    pip install -e .
    pip install -e third_party/DynamixelSDK/python
@@ -110,7 +114,7 @@ UniBiDex/
 2. **Set up the environment**
    ```bash
    # Create conda environment
-   conda create -n unibidex python=3.8
+   conda create -n unibidex python=3.10
    conda activate unibidex
    
    # Install core dependencies
@@ -134,23 +138,6 @@ UniBiDex/
    # Configure workspace if needed
    # (ROS2 integration is streamlined in the new framework)
    ```
-
-### Docker Setup (Recommended)
-
-1. **Build Docker image**
-   ```bash
-   docker build . -t unibidex:latest
-   ```
-
-2. **Launch container**
-   ```bash
-   # Run with hardware access for real robots
-   docker run -it --privileged --net=host \
-     -v /dev:/dev \
-     -v $PWD:/workspace \
-     unibidex:latest
-   ```
-
 ---
 
 ## 🎮 Usage
@@ -160,13 +147,14 @@ UniBiDex/
 1. **Configure UniBiDex devices**
    ```bash
    # Calibrate UniBiDex leader arms
-   python scripts/calib/unibidex_get_offset.py --port /dev/ttyUSB0
+   Left arm: python scripts/calib/unibidex_get_offset.py unibidex_left.yml
+   Right arm: python scripts/calib/unibidex_get_offset.py unibidex_right.yml
    ```
 
 2. **Start teleoperation**
    ```bash
    # Main teleoperation script with bimanual control
-   python scripts/main.py --bimanual --hz 100
+   python scripts/main.py
    ```
 
 ### Robot Control with UniBiDex Client
@@ -190,11 +178,6 @@ UniBiDex/
    python sim/envs/xarm_mujoco_sim.py
    ```
 
-2. **Run with visualization**
-   ```bash
-   python scripts/visualize_example.py
-   ```
-
 ### Data Collection & Replay
 
 1. **Collect demonstration data**
@@ -205,7 +188,7 @@ UniBiDex/
 
 2. **Replay demonstrations**
    ```bash
-   # Simulation replay
+   # Dummy replay 
    python -m unibidex_client.nodes.data_playback --zarr_path ./demo_data.zarr --mode print
    
    # Real robot replay
@@ -230,111 +213,51 @@ sudo udevadm trigger
 python -m unibidex_client.nodes.camera_view_selector
 ```
 
-#### Robot Configuration
+#### Robot and Control Configuration
 Edit configuration files in `unibidex_client/configs/`:
 - `bimanual.yml`: Main bimanual control parameters
 - Robot-specific configs for XArm7 and grippers
-
-### Software Configuration
-
-#### UniBiDex Calibration
-```bash
-# Calibrate left and right UniBiDex devices
-python scripts/calib/unibidex_get_offset.py --port /dev/ttyUSB0 --side left
-python scripts/calib/unibidex_get_offset.py --port /dev/ttyUSB1 --side right
-```
-
-#### Control Parameters
-Key parameters in `unibidex_client/configs/`:
 - Controller gains and limits
 - Safety constraints  
 - Hardware interface settings
 
 ---
 
-## � Experiments
+## 🧪 Experiments
 
-### Kitchen Tidying Task
-```bash
-cd unibidex/experiments
-python kitchen_tidying.py --mode vr  # VR mode
-python kitchen_tidying.py --mode unibidex  # UniBiDex mode
-```
+### Bimanual Manipulation Benchmarks
 
-### Custom Tasks
-1. Create experiment configuration in `experiments/`
-2. Define task parameters and constraints
-3. Run with either VR or UniBiDex input
+Our framework has been validated on a comprehensive set of bimanual kitchen tidying tasks that require varying degrees of coordination:
 
----
+#### Task Categories
+- **Contact-Rich Manipulation**: Tasks requiring precise force control and tactile feedback
+- **Coordination-Heavy Tasks**: Complex bimanual coordination patterns
+- **Dexterous Assembly**: Fine motor skills for assembly operations  
+- **Kitchen Scenarios**: Real-world domestic manipulation tasks
 
-## 📊 Datasets
-
-We provide demonstration datasets for common bimanual manipulation tasks:
-
-- **Kitchen Tidying**: 40 demonstrations across VR and UniBiDex modalities
-- **Assembly Tasks**: Complex multi-step manipulation sequences
-- **Contact-Rich Tasks**: Tasks requiring precise force control
-
-Download datasets from [our website](https://dieselmarble.github.io/UniBiDex/) or generate your own using our data collection pipeline.
-
----
-
-## 🧩 Extending UniBiDex
-
-### Adding New Robot Types
-
-1. **Implement robot interface** in `unibidex_client/motion_control/`
-2. **Create configuration file** in `unibidex_client/configs/`  
-3. **Add URDF models** to `assets/urdf/`
-4. **Register robot** in control nodes
-
-### Custom Control Algorithms
-
-1. **Extend base controller** in `unibidex_client/motion_control/base.py`
-2. **Implement custom IK/dynamics** following existing examples
-3. **Configure parameters** in YAML config files
+#### Evaluation Metrics
+- Task completion rates across different modalities (VR vs UniBiDex)
+- Motion smoothness and efficiency
+- Force/torque profiles during contact
+- User fatigue and learning curves
 
 ---
 
 ## 📝 Citation
 
-If you find UniBiDex useful in your research, please cite:
+If you find UniBiDex useful in your research, please cite our paper:
 
 ```bibtex
 @article{li2025unibidex,
-    title   = {UniBiDex: A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation},
+    title   = {A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation},
     author  = {Zhongxuan Li and Zeliang Guo and Jun Hu and David Navarro-Alarcon and Jia Pan and Hongmin Wu and Peng Zhou},
-    journal = {2025 IEEE International Conference on Robotics and Biomimetics},
+    journal = {arXiv preprint arXiv:2501.XXXXX},
     year    = {2025}
 }
 ```
 
 ---
 
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Development Setup
-
-1. **Install development dependencies**
-   ```bash
-   pip install -r requirements_dev.txt
-   pre-commit install
-   ```
-
-2. **Run tests**
-   ```bash
-   pytest tests/
-   ```
-
-3. **Code formatting**
-   ```bash
-   black . && isort . && flake8
-   ```
-
----
 
 ## 📞 Support
 
