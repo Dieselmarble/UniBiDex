@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="unibidex",
     version="0.0.1",
-    author="Philipp Wu",
-    author_email="philippwu@berkeley.edu",
+    author="Zhongxuan Li",
+    author_email="lizhongxuanchina@gmail.com",
     description="software for UniBiDex",
     long_description=long_description,
     long_description_content_type="text/markdown",
