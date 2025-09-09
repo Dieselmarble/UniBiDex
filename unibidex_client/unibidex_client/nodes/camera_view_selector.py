@@ -7,8 +7,12 @@ import glob
 from PySide6 import QtWidgets, QtGui, QtCore
 import cv2
 
-# Parse lsusb for USB Camera IDs
-def get_usb_camera_ids():
+# Parse lsusb for USB Camera ID    devices = []
+    # new: Only take from each physical port "index0" stream
+    for entry in sorted(glob.glob('/dev/v4l/by-path/*-video-index0')):
+        # Real device node /dev/videoX
+        dev = os.path.realpath(entry)
+        did = get_device_id(dev)get_usb_camera_ids():
     try:
         out = subprocess.check_output(['lsusb'], text=True)
     except Exception as e:

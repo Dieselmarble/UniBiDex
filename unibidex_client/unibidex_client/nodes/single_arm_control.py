@@ -111,10 +111,10 @@ class SingleArmTeleopController:
 
         self.min_rotation_scale = 0.4       # Fine rotation amplification
         self.max_rotation_scale = 1.2       # Coarse rotation amplification
-        self.ref_rotation_speed = 0.10      # rad/s, 超过此速度则旋转放大到最大
+        self.ref_rotation_speed = 0.10      # rad/s, exceed this speed then increase rotation scaling to max
 
-        self._last_ctrl_p = None            # 存储上一帧手柄位置
-        self._last_ctrl_R = None            # 存储上一帧手柄姿态
+        self._last_ctrl_p = None            # store last controller hand position
+        self._last_ctrl_R = None            # store last controller hand orientation
 
         # TCP offset if provided
         if tcp_offset is not None:
@@ -168,33 +168,33 @@ class SingleArmTeleopController:
     
     def rotate_tcp_around_world_axis(self, axis: str, angle_deg: float, ini_t):
         """
-        让末端 TCP 绕 世界坐标系 的 X/Y/Z 轴 原地旋转 angle_deg 度（保持当前位置不变）。
+        Rotate the end-effector TCP around a world-frame X/Y/Z axis by angle_deg degrees while keeping the current position unchanged.
         
-        :param axis: 'x'、'y' 或 'z'
-        :param angle_deg: 旋转角度，正值按右手规则
+        :param axis: 'x', 'y' or 'z'
+        :param angle_deg: rotation angle in degrees; positive follows right-hand rule
         """
-        # 1) 当前 world → TCP SE3
+        # 1) current world->TCP SE3
         current_se3 = self.ctrl.get_current_tcp_pose()
         R_curr      = current_se3.rotation
         p_curr      = current_se3.translation
 
-        # 2) 选轴并构造 world‐axis 的增量旋转
+        # 2) select axis and build delta rotation about world-axis
         axes = {
             'x': np.array([1.0, 0.0, 0.0]),
             'y': np.array([0.0, 1.0, 0.0]),
             'z': np.array([0.0, 0.0, 1.0]),
         }
         if axis not in axes:
-            raise ValueError("axis 必须是 'x'、'y' 或 'z'")
+            raise ValueError("axis must be 'x', 'y' or 'z'")
         axis_vec = axes[axis]
         angle   = np.deg2rad(angle_deg)
         R_delta = pin.exp3(axis_vec * angle)
 
-        # 3) 旋转朝向，位置保持不变
+        # 3) rotation direction and keep position fixed
         R_target = R_delta @ R_curr
         target_se3 = pin.SE3(R_target, ini_t)
 
-        # 4) 调用 control_command（内部会用你那个 LOCAL_WORLD_ALIGNED 的 IK）
+        # 4) apply control_command (internally uses your LOCAL_WORLD_ALIGNED IK)
         self.ctrl.control_command(target_se3)
         
     def run(self):
@@ -223,7 +223,7 @@ class SingleArmTeleopController:
                     self.robot_init_se3 = self.ctrl.get_current_tcp_pose()
                     self.R_robot_init = self.robot_init_se3.rotation
                     self.R_ctrl_init = R_ctrl.copy()
-                    # 存储上一次手柄位置/旋转
+                    # store controller hand position/orientation once
                     self._last_ctrl_p = p_ctrl.copy()
                     self._last_ctrl_R = R_ctrl.copy()
                     logger.info("Recorded initial robot and controller poses.")
@@ -234,7 +234,7 @@ class SingleArmTeleopController:
                 delta_p_hand = p_ctrl - self._last_ctrl_p
                 v_hand = np.linalg.norm(delta_p_hand) / self.dt
                 t_scale = self.min_translation_scale + (self.max_translation_scale - self.min_translation_scale) * min(1.0, v_hand / self.ref_translation_speed)
-                # 2. 计算相对初始点的平移，并加缩放
+                # 2. compute translation relative to the initial point, and scale
                 delta_p = p_ctrl * t_scale
                 target_p = self.robot_init_se3.translation + delta_p
 
@@ -244,19 +244,19 @@ class SingleArmTeleopController:
                 w_hand = np.linalg.norm(rotvec) / self.dt
                 r_scale = self.min_rotation_scale + (self.max_rotation_scale - self.min_rotation_scale) * min(1.0, w_hand / self.ref_rotation_speed)
 
-                # 旋转缩放
+                # scale rotation
                 R_rel = self.R_ctrl_init.T @ R_ctrl
                 rot_vec = pin.log3(R_rel)
                 R_rel_scaled = pin.exp3(rot_vec * r_scale)
                 R_target_relative_baselink = self.ctrl.project_rotation_to_baselink(R_rel_scaled)
-                R_target = self.R_robot_init @ R_target_relative_baselink     # 相对baselink
+                R_target = self.R_robot_init @ R_target_relative_baselink     # relative to baselink
 
                 # Command arm
                 target_se3 = pin.SE3(R_target, target_p)
                 visualize_rotation_angles(R_target)
                 self.ctrl.control_command(target_se3)
 
-                # 存储本周期的手柄位置/姿态，用于下一轮速度计算
+                # store this cycle's controller hand position/orientation for next-step velocity calculation
                 self._last_ctrl_p = p_ctrl.copy()
                 self._last_ctrl_R = R_ctrl.copy()
 

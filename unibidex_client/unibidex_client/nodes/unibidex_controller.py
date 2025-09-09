@@ -30,7 +30,7 @@ class SingleUniBiDexController:
     Sub-process level controller wrapper:
       - Initialize Pinocchio controller + Robotiq
       - Execute gripper commands asynchronously to avoid blocking
-      - step_with_external_state 只做非阻塞的 gripper 调度
+      - step_with_external_state only performs non-blocking gripper scheduling
     """
     def __init__(self, ctrl_cfg, side: str):
 
@@ -40,7 +40,7 @@ class SingleUniBiDexController:
         self.side = side
         self.dt = ctrl_cfg["dt"]
 
-        # 夹爪参数和状态
+        # gripper parameters and state
         gr_cfg = ctrl_cfg["gripper"]
         gripper_serial = gr_cfg["serial"]
         self.gripper_speed = gr_cfg.get("speed", 50.0)
@@ -52,13 +52,13 @@ class SingleUniBiDexController:
         self.gripper.reset()
         time.sleep(0.5)
 
-        # 平滑开度目标和线程控制
+        # smooth opening target and thread control
         self.desired_opening = self.gripper.opening
         self._stop_gripper_thread = False
         self._gripper_thread = threading.Thread(target=self._gripper_loop, daemon=True)
         self._gripper_thread.start()
 
-        # 机械臂控制器
+        # motion controller
         self.ctrl = XArm7PinocchioController(
             urdf_path=ctrl_cfg["urdf_path"],
             ee_link_name=ctrl_cfg.get("ee_link_name", "link_eef"),
@@ -71,7 +71,7 @@ class SingleUniBiDexController:
         )
         self.ctrl.set_safety_center(self.ctrl.get_current_tcp_pose().translation)
         self.ctrl.set_safety_radius(0.5)
-        # 清点、上电
+        # clear errors, power on
         self.ctrl.arm.clean_error()
         self.ctrl.arm.clean_warn()
         self.ctrl.arm.motion_enable(True)
@@ -83,7 +83,9 @@ class SingleUniBiDexController:
         self.logger.info(f"Controller for '{side}' initialized.")
     
     def _gripper_loop(self):
-        """后台循环：读取 desired_opening，用滤波平滑，并固定频率下发位置命令"""
+        """
+        Background loop: read desired_opening, apply exponential smoothing, and send position commands at a fixed rate
+        """
         prev = self.gripper.opening
         alpha = 0.2
         rate = 50  # Hz
@@ -106,25 +108,26 @@ class SingleUniBiDexController:
             time.sleep(interval)
 
     def step_with_external_state(self, arm_cmd, gripper_cmd=0, teleop=True):
-        """主循环每步：
-         - 更新机械臂目标
-         - 写入夹爪目标，不再启动新线程
-         - 睡眠一个控制周期
+        """
+        Main loop per step:
+         - Update robot target
+         - Write gripper target, no longer start a new thread
+         - Sleep one control period
         """
         if not arm_cmd:
             time.sleep(self.dt)
             return
 
-        # 1) 解析命令
+        # 1) parse command
         qj     = np.array(arm_cmd, dtype=float)
         gr_val = float(gripper_cmd)  # [0,1]
 
-        # 2) 更新机械臂目标
+        # 2) update robot target
         with self.ctrl._arm_lock:
             self.ctrl._arm_target = qj.copy()
         self.logger.debug(f"[{self.side}] New arm target: {qj}")
 
-        # 3) 更新夹爪目标开度
+        # 3) update gripper opening target
         # gr_val=0->fully open, 1->fully closed
         if teleop:
             opening = (1.0 - gr_val) * (self.gripper_max_opening - self.gripper_min_opening) + self.gripper_min_opening
@@ -132,15 +135,15 @@ class SingleUniBiDexController:
             opening = gr_val
         self.desired_opening = opening
 
-        # 4) 睡眠
+        # 4) sleep
         time.sleep(self.dt)
 
     def shutdown(self):
-        # 停止 gripper 线程并清理
+        # stop gripper thread and cleanup
         self._stop_gripper_thread = True
         self._gripper_thread.join(timeout=1.0)
         self.gripper.reset()
-        # 关闭机械臂扭矩
+        # disable robot torque
         self.ctrl.arm.clean_error()
         self.ctrl.arm.motion_enable(False)
 
@@ -155,18 +158,18 @@ def run_controller_proc(ctrl_cfg, teleop_data, side):
         rate_hz = ctrl_cfg.get("feedback_hz", int(1.0/ctrl.dt))
         interval = 1.0/rate_hz
         while True:
-            # 1) 读机械臂电流（shape: [7]）
+            # 1) read arm currents (shape: [7])
             arm_currents = ctrl.ctrl.get_latest_currents()
-            # 2) 读夹爪电流（标量或 shape: [1]）
+            # 2) read gripper current (scalar or shape: [1])
             gripper_current = 0.0 #ctrl.gripper.current
-            # 3) 合并成一个 array，比如最后一位存夹爪电流
+            # 3) combine into one array, e.g. last element store gripper current
             all_currents = np.concatenate([
                 np.array(arm_currents, dtype=float),
                 np.atleast_1d(gripper_current).astype(float)
             ])
-            # 4) 读机械臂关节角度
+            # 4) read joint angles
             joint_angles = ctrl.ctrl.get_arm_qpos()
-            # 5) 写回共享 dict
+            # 5) write back to shared dict
             teleop_data[f"{side}_currents"] = all_currents.tolist()
             teleop_data[f"{side}_angles"] = np.array(joint_angles, dtype=float).tolist()
             teleop_data[f"{side}_gripper_opening"] = float(ctrl.gripper.opening)
@@ -197,11 +200,11 @@ def main():
     left_cfg = config["controllers"]["left"]
     right_cfg = config["controllers"]["right"]
 
-    # ROS2 初始化与 Bridge 节点
+    # ROS2 initialization and Bridge node
     rclpy.init()
     bridge_node = UniBiDexBridgeNode(teleop_data, feedback_hz=200.0)
 
-    # 启动左右臂控制进程
+    # Start left and right arm control processes
     l_proc = multiprocessing.Process(target=run_controller_proc, args=(left_cfg, teleop_data, 'left'), daemon=True)
     r_proc = multiprocessing.Process(target=run_controller_proc, args=(right_cfg, teleop_data, 'right'), daemon=True)
     l_proc.start()
@@ -213,7 +216,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt—shutting down.")
     finally:
-        # 清理
+        # Clean up
         # rec_proc.terminate()
         l_proc.terminate()
         r_proc.terminate()

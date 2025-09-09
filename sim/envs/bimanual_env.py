@@ -84,31 +84,31 @@ class BimanualXArm7Env(gym.Env):
         self.right_joint_limits = self.left_joint_limits.copy()
         
         if self.use_grippers:
-            # Gripper limits (从XML ctrlrange: 0-255)
+            # Gripper limits (from XML ctrlrange: 0-255)
             gripper_limits = np.array([[0.0, 255.0]])
             self.left_joint_limits = np.vstack([self.left_joint_limits, gripper_limits])
             self.right_joint_limits = np.vstack([self.right_joint_limits, gripper_limits])
         
-        # Action space现在直接使用弧度范围 - 在关节限制定义后创建
+        # Action space now directly uses radian range - created after joint limits definition
         if self.use_grippers:
-            # 包含夹爪：左臂7关节+夹爪1 + 右臂7关节+夹爪1
+            # Including grippers: left arm 7 joints + gripper 1 + right arm 7 joints + gripper 1
             action_low = np.concatenate([
-                self.left_joint_limits[:, 0],   # 左臂+夹爪下限
-                self.right_joint_limits[:, 0]   # 右臂+夹爪下限
+                self.left_joint_limits[:, 0],   # left arm + gripper lower limits
+                self.right_joint_limits[:, 0]   # right arm + gripper lower limits
             ])
             action_high = np.concatenate([
-                self.left_joint_limits[:, 1],   # 左臂+夹爪上限
-                self.right_joint_limits[:, 1]   # 右臂+夹爪上限
+                self.left_joint_limits[:, 1],   # left arm + gripper upper limits
+                self.right_joint_limits[:, 1]   # right arm + gripper upper limits
             ])
         else:
-            # 仅关节：左臂7关节 + 右臂7关节
+            # Joints only: left arm 7 joints + right arm 7 joints
             action_low = np.concatenate([
-                self.left_joint_limits[:7, 0],  # 左臂下限
-                self.right_joint_limits[:7, 0]  # 右臂下限
+                self.left_joint_limits[:7, 0],  # left arm lower limits
+                self.right_joint_limits[:7, 0]  # right arm lower limits
             ])
             action_high = np.concatenate([
-                self.left_joint_limits[:7, 1],  # 左臂上限
-                self.right_joint_limits[:7, 1]  # 右臂上限
+                self.left_joint_limits[:7, 1],  # left arm upper limits
+                self.right_joint_limits[:7, 1]  # right arm upper limits
             ])
         
         self.action_space = spaces.Box(
@@ -216,15 +216,15 @@ class BimanualXArm7Env(gym.Env):
         # Reset MuJoCo simulation
         mujoco.mj_resetData(self.model, self.data)
         
-        # Set initial joint positions (使用XML中定义的初始角度)
+        # Set initial joint positions (using initial angles defined in XML)
         if self.use_grippers:
-            # Left arm: 从图片中的角度转换而来 (弧度) + gripper
+            # Left arm: converted from angles in image (radians) + gripper
             self.data.qpos[:7] = [0, -0.22, 0, 0.873, 0.0105, 1.117, -0.0035]  
-            # Right arm: 同样的角度 + gripper  
+            # Right arm: same angles + gripper  
             self.data.qpos[15:22] = [0, -0.22, 0, 0.873, 0.0105, 1.117, -0.0035]
-            # 设置夹爪初始位置为关闭状态 (0 = fully closed)
-            self.data.qpos[7:15] = [0.0] * 8      # 左夹爪所有关节 - 初始关闭
-            self.data.qpos[22:30] = [0.0] * 8     # 右夹爪所有关节 - 初始关闭
+            # Set gripper initial position to closed state (0 = fully closed)
+            self.data.qpos[7:15] = [0.0] * 8      # all left gripper joints - initially closed
+            self.data.qpos[22:30] = [0.0] * 8     # all right gripper joints - initially closed
         else:
             # Just arm joints
             self.data.qpos[:7] = [0, -0.22, 0, 0.873, 0.0105, 1.117, -0.0035]  # left arm
@@ -252,7 +252,7 @@ class BimanualXArm7Env(gym.Env):
     
     def step(self, action: np.ndarray) -> Tuple[Dict, float, bool, bool, Dict]:
         """Step the environment"""
-        # 直接使用弧度值，不进行任何裁剪
+        # Use radian values directly, without any clipping
         if self.use_grippers:
             left_action = action[:8]
             right_action = action[8:16]
@@ -260,7 +260,7 @@ class BimanualXArm7Env(gym.Env):
             left_action = action[:7]
             right_action = action[7:14]
         
-        # 直接使用原始动作值，不裁剪到关节限制
+        # Use original action values directly, without clipping to joint limits
         left_scaled = left_action
         right_scaled = right_action
         

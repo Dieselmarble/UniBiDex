@@ -16,7 +16,7 @@ from message_filters import Subscriber, ApproximateTimeSynchronizer
 
 
 class DataRecorder(Node):
-    """Use ApproximateTimeSynchronizer to sync seven topics and write to Zarr。"""
+    """Use ApproximateTimeSynchronizer to sync seven topics and write to Zarr."""
     def __init__(self, zarr_path: str = None, slop: float = 0.05, queue_size: int = 500):
         super().__init__('data_recorder')
         self.bridge = CvBridge()
@@ -24,7 +24,7 @@ class DataRecorder(Node):
         self._initialized = False
         self._start_time = time.time()
 
-        # Zarr Initialization
+        # Zarr initialization
         if zarr_path is None:
             ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
             zarr_path = os.path.expanduser(f'~/Desktop/teleop_data_{ts}.zarr')
@@ -53,7 +53,7 @@ class DataRecorder(Node):
         self.get_logger().info(f'ApproximateTimeSynchronizer ready (slop={slop}s, queue={queue_size}).')
 
     def _initialize_datasets(self, joint_dim: int):
-        """Dynamically create Zarr datasets based on joint dimensions。"""
+        """Dynamically create Zarr datasets based on joint dimensions."""
         self._root.create_dataset('commands',
             shape=(0, 2, joint_dim), chunks=(1,2,joint_dim),
             dtype='f4', compressor=zarr.Blosc())
@@ -81,23 +81,23 @@ class DataRecorder(Node):
                        img_l_msg: Image,
                        img_r_msg: Image,
                        img_f_msg: Image):
-        """Called when a group of approximately synchronized messages arrive, write one frame。"""
-        # Initialization datasets（Only on first time）
+        """Called when a group of approximately synchronized messages arrive, write one frame."""
+        # Initialize datasets (only on first time)
         if not self._initialized:
             dim = len(l_cmd_msg.data)
             self._initialize_datasets(dim)
 
-        # ---- 写入命令数据 ----
+        # ---- Write command data ----
         L = np.array(l_cmd_msg.data, dtype='f4')
         R = np.array(r_cmd_msg.data, dtype='f4')
         cmd_arr = np.stack([L, R], axis=0)
         self._cmd_ds.append(cmd_arr[np.newaxis, ...])
 
-        # ---- 写入夹爪数据 ----
+        # ---- Write gripper data ----
         grips = np.array([float(l_grip_msg.data), float(r_grip_msg.data)], dtype='f4')
         self._grip_ds.append(grips[np.newaxis, ...])
 
-        # ---- 转换并写入图像 ----
+        # ---- Convert and write images ----
         try:
             f_l = self.bridge.imgmsg_to_cv2(img_l_msg, desired_encoding='bgr8')
             f_r = self.bridge.imgmsg_to_cv2(img_r_msg, desired_encoding='bgr8')
@@ -105,14 +105,14 @@ class DataRecorder(Node):
         except (CvBridgeError, cv2.error) as e:
             self.get_logger().error(f"Image conversion failed: {e}")
             return
-        # 调整尺寸
+        # Resize images
         f_l = cv2.resize(f_l, (640, 480))
         f_r = cv2.resize(f_r, (640, 480))
         f_f = cv2.resize(f_f, (640, 480))
         img_stack = np.stack([f_l, f_r, f_f], axis=0)
         self._img_ds.append(img_stack[np.newaxis, ...])
 
-        # ---- 写入时间戳 ----
+        # ---- Write timestamps ----
         t = self.get_clock().now().nanoseconds * 1e-9
         self._ts_ds.append(np.array([t], dtype='f8'))
 

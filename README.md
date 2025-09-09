@@ -10,6 +10,8 @@
 
 *A unified teleoperation framework for robotic bimanual dexterous manipulation*
 
+> **🆕 Latest Updates**: The codebase has been restructured for better modularity and maintainability. Key improvements include unified device management, streamlined configuration, and enhanced simulation support.
+
 [**Paper**](https://arxiv.org/abs/2501.XXXXX) | [**Website**](https://dieselmarble.github.io/UniBiDex/) | [**Video**](https://youtu.be/XXXXX) | [**Data**](#datasets)
 
 </div>
@@ -18,16 +20,16 @@
 
 ## 🔥 Highlights
 
-**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** across heterogeneous input devices. Our system integrates VR headsets, leader-follower arms, and advanced control algorithms to achieve precise, safe, and efficient dual-arm manipulation.
+**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** with haptic leader-follower devices. Our system integrates cost-effective hardware design, advanced control algorithms, and simulation environments to achieve precise, safe, and efficient dual-arm manipulation.
 
 ### Key Features
 
-- 🎮 **Universal Device Support**: Seamlessly integrate VR headsets (Meta Quest 3) and leader-follower arms (UniBiDex)
-- 🤝 **Unified Control Framework**: Single control stack handles multiple input modalities with consistent behavior  
-- 🛡️ **Safety-Aware Control**: Advanced inverse kinematics with collision avoidance and singularity handling
+- 🎮 **Unified Leader-Follower Control**: Custom-designed UniBiDex devices provide intuitive bimanual teleoperation
+- 🤝 **Bimanual Coordination**: Advanced control framework handles dual-arm manipulation with coordinated motion  
+- 🛡️ **Safety-Aware Control**: Collision avoidance, singularity handling, and workspace limits
 - 🔄 **Null-Space Optimization**: Exploit arm redundancy for optimal bimanual coordination
-- 📱 **Haptic Feedback**: Cost-effective force feedback using motor current sensing
-- 🐳 **Production Ready**: Dockerized deployment with comprehensive ROS2 integration
+- 📱 **Haptic Feedback**: Force feedback using motor current sensing for enhanced immersion
+- 🐳 **Modular Design**: Extensible architecture for different robots and control algorithms
 
 ---
 
@@ -35,18 +37,27 @@
 
 ```
 UniBiDex/
-├── 📦 banana_teleoperation/          # VR teleoperation pipeline
-│   ├── banana_teleop_client/         # Robot control client
-│   ├── banana_teleop_server/         # VR pose streaming server
-│   └── assets/                       # 3D models and calibration files
-├── 🤖 unibidex/                      # Core UniBiDex framework
-│   ├── unibidex_core/                        # UniBiDex leader-follower integration
-│   ├── ros2/                         # ROS2 nodes and controllers
-│   ├── scripts/                      # Control scripts and utilities
-│   └── experiments/                  # Experimental configurations
-├── 🤏 gripper/                       # Gripper control modules
-├── 📄 docs/                          # Documentation
-└── 🌐 website/                       # Project website (gh-pages)
+├── 🎮 assets/                        # 3D models and calibration files
+│   ├── images/                       # Project images and logos
+│   └── urdf/                         # Robot URDF models
+├── 📜 scripts/                       # Main control scripts
+│   ├── main.py                       # Core teleoperation script
+│   ├── visualize_example.py          # Visualization utilities
+│   └── calib/                        # Calibration scripts and configs
+├── 🤖 unibidex_core/                 # Core UniBiDex framework
+│   ├── agents/                       # Agent implementations
+│   ├── dynamixel/                    # Dynamixel motor control
+│   └── robots/                       # Robot interface modules
+├── 🎛️ unibidex_client/               # Robot control client
+│   ├── motion_control/               # Motion controllers (XArm7, grippers)
+│   ├── nodes/                        # ROS2 nodes and utilities
+│   ├── configs/                      # Configuration files
+│   └── tests/                        # Test scripts
+├── � sim/                           # Simulation environments
+│   └── envs/                         # MuJoCo simulation environments
+└── 🔧 third_party/                   # Third-party dependencies
+    ├── DynamixelSDK/                 # Dynamixel SDK
+    └── mujoco_menagerie/             # MuJoCo robot models
 ```
 
 ---
@@ -57,8 +68,36 @@ UniBiDex/
 
 - **OS**: Ubuntu 20.04/22.04 (recommended)
 - **Python**: ≥ 3.8
-- **ROS2**: Humble
-- **Hardware**: Meta Quest 3, xArm7 robots, UniBiDex devices (optional)
+- **Hardware**: XArm7 robots, UniBiDex leader devices, Robotiq grippers (optional)
+- **Dependencies**: Modern C++ compiler, OpenCV, NumPy
+
+### Basic Setup
+
+1. **Clone and install**
+   ```bash
+   git clone --recursive https://github.com/Dieselmarble/UniBiDex.git
+   cd UniBiDex
+   conda create -n unibidex python=3.8
+   conda activate unibidex
+   pip install -e .
+   pip install -e third_party/DynamixelSDK/python
+   cd unibidex_client && pip install -e . && cd ..
+   ```
+
+2. **Test installation**
+   ```bash
+   # Test with mock devices (no hardware required)
+   python scripts/main.py --mock --verbose
+   
+   # Test robot control (requires XArm7)
+   cd unibidex_client && python tests/test_xarm7.py
+   ```
+
+3. **Run simulation**
+   ```bash
+   # Start MuJoCo simulation
+   python sim/envs/xarm_mujoco_sim.py
+   ```
 
 ### Installation
 
@@ -74,11 +113,17 @@ UniBiDex/
    conda create -n unibidex python=3.8
    conda activate unibidex
    
-   # Install dependencies
-   cd unibidex
+   # Install core dependencies
    pip install -r requirements.txt
    pip install -e .
+   
+   # Install Dynamixel SDK
    pip install -e third_party/DynamixelSDK/python
+   
+   # Install UniBiDex client for robot control
+   cd unibidex_client
+   pip install -e .
+   cd ..
    ```
 
 3. **Configure ROS2 (if using real robots)**
@@ -86,70 +131,85 @@ UniBiDex/
    # Source ROS2
    source /opt/ros/humble/setup.bash
    
-   # Build ROS2 workspace
-   cd ros2
-   colcon build
-   source install/setup.bash
+   # Configure workspace if needed
+   # (ROS2 integration is streamlined in the new framework)
    ```
 
 ### Docker Setup (Recommended)
 
 1. **Build Docker image**
    ```bash
-   cd unibidex
    docker build . -t unibidex:latest
    ```
 
 2. **Launch container**
    ```bash
-   python scripts/launch.py
+   # Run with hardware access for real robots
+   docker run -it --privileged --net=host \
+     -v /dev:/dev \
+     -v $PWD:/workspace \
+     unibidex:latest
    ```
 
 ---
 
 ## 🎮 Usage
 
-### VR Teleoperation
+### UniBiDex Teleoperation
 
-1. **Start the VR server** (Quest 3)
+1. **Configure UniBiDex devices**
    ```bash
-   cd banana_teleoperation/banana_teleop_server
-   python main.py --config configs/vr_config/quest_config.yml
-   ```
-
-2. **Launch robot client**
-   ```bash
-   cd banana_teleoperation/banana_teleop_client
-   python main.py --config configs/bimanual.yml
-   ```
-
-### Leader-Follower Teleoperation
-
-1. **Configure UniBiDex devices** (see [UniBiDex Setup](#unibidex-setup))
-   ```bash
-   cd unibidex
-   python scripts/configure_unibidex.py --port /dev/ttyUSB0
+   # Calibrate UniBiDex leader arms
+   python scripts/calib/unibidex_get_offset.py --port /dev/ttyUSB0
    ```
 
 2. **Start teleoperation**
    ```bash
-   python scripts/teleop_unibidex.py --config experiments/bimanual_unibidex.py
+   # Main teleoperation script with bimanual control
+   python scripts/main.py --bimanual --hz 100
+   ```
+
+### Robot Control with UniBiDex Client
+
+1. **Single arm control**
+   ```bash
+   cd unibidex_client
+   python -m unibidex_client.nodes.single_arm_control
+   ```
+
+2. **Bimanual control**
+   ```bash
+   cd unibidex_client
+   python -m unibidex_client.nodes.unibidex_controller --config configs/bimanual.yml
+   ```
+
+### MuJoCo Simulation
+
+1. **Start simulation environment**
+   ```bash
+   python sim/envs/xarm_mujoco_sim.py
+   ```
+
+2. **Run with visualization**
+   ```bash
+   python scripts/visualize_example.py
    ```
 
 ### Data Collection & Replay
 
 1. **Collect demonstration data**
    ```bash
-   python scripts/collect_data.py --output ./demo_data.zarr
+   cd unibidex_client
+   python -m unibidex_client.nodes.data_recorder
    ```
 
 2. **Replay demonstrations**
    ```bash
    # Simulation replay
-   python scripts/data_playback.py --zarr_path ./demo_data.zarr --mode sim
+   python -m unibidex_client.nodes.data_playback --zarr_path ./demo_data.zarr --mode print
    
    # Real robot replay
-   python scripts/data_playback.py --zarr_path ./demo_data.zarr --mode real --config configs/bimanual.yml
+   python -m unibidex_client.nodes.data_playback --zarr_path ./demo_data.zarr --mode real --config configs/bimanual.yml
    ```
 
 ---
@@ -161,23 +221,33 @@ UniBiDex/
 #### Camera Configuration
 ```bash
 # Set up camera rules for consistent device naming
-sudo cp banana_teleoperation/assets/camera_roles.rules /etc/udev/rules.d/99-camera-roles.rules
+cd unibidex_client
+sudo cp camera_roles.rules /etc/udev/rules.d/99-camera-roles.rules
 sudo udevadm control --reload-rules
 sudo udevadm trigger
+
+# Run camera view selector to assign camera roles
+python -m unibidex_client.nodes.camera_view_selector
 ```
 
 #### Robot Configuration
-Edit configuration files in `banana_teleoperation/banana_teleop_client/configs/`:
+Edit configuration files in `unibidex_client/configs/`:
 - `bimanual.yml`: Main bimanual control parameters
-- `cameras.yml`: Camera settings and calibration
-- Robot-specific configs in `banana_teleop_server/configs/robot_config/`
+- Robot-specific configs for XArm7 and grippers
 
 ### Software Configuration
 
-#### ROS2 Parameters
-Key parameters in `unibidex/ros2/src/*/config/`:
+#### UniBiDex Calibration
+```bash
+# Calibrate left and right UniBiDex devices
+python scripts/calib/unibidex_get_offset.py --port /dev/ttyUSB0 --side left
+python scripts/calib/unibidex_get_offset.py --port /dev/ttyUSB1 --side right
+```
+
+#### Control Parameters
+Key parameters in `unibidex_client/configs/`:
 - Controller gains and limits
-- Safety constraints
+- Safety constraints  
 - Hardware interface settings
 
 ---
@@ -212,17 +282,18 @@ Download datasets from [our website](https://dieselmarble.github.io/UniBiDex/) o
 
 ## 🧩 Extending UniBiDex
 
-### Adding New Input Devices
+### Adding New Robot Types
 
-1. **Implement device interface** in `unibidex/devices/`
-2. **Create configuration file** with device parameters
-3. **Register device** in the main control loop
+1. **Implement robot interface** in `unibidex_client/motion_control/`
+2. **Create configuration file** in `unibidex_client/configs/`  
+3. **Add URDF models** to `assets/urdf/`
+4. **Register robot** in control nodes
 
-### Custom Robot Integration
+### Custom Control Algorithms
 
-1. **Add robot model** to `banana_teleoperation/assets/`
-2. **Configure kinematics** in robot config files  
-3. **Implement robot interface** following existing examples
+1. **Extend base controller** in `unibidex_client/motion_control/base.py`
+2. **Implement custom IK/dynamics** following existing examples
+3. **Configure parameters** in YAML config files
 
 ---
 
@@ -281,9 +352,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **UniBiDex**: Built upon the excellent [GELLO framework](https://github.com/wuphilipp/gello_software)
-- **ROS2**: Powered by the Robot Operating System 2
-- **Contributors**: Thanks to all contributors who made this project possible
+- **Inspiration**: Built upon excellent open-source robotics frameworks
+- **Hardware**: Thanks to UFactory for XArm7 platform support
+- **Community**: Thanks to all contributors who made this project possible
+- **Funding**: Supported by research grants and industry partnerships
 
 ---
 

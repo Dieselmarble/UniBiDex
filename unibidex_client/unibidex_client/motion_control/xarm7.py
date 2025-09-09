@@ -193,7 +193,7 @@ class XArm7PinocchioController(MotionControllerBase):
                     logger.error(
                         f"EE exceeds safety radius! Distance from center {dist:.3f} m (limit {self.safety_radius} m), executing emergency stop."
                     )
-                    self.arm.motion_enable(False)  # XArmAPI 紧急停机
+                    self.arm.motion_enable(False)  # XArmAPI emergency stop
                     break
             except Exception as e:
                 logger.warning(f"Watchdog thread error: {e}")

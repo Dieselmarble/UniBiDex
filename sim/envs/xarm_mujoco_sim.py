@@ -4,7 +4,7 @@
 # Set environment variables for better display compatibility
 import os
 # If you encounter GLX errors, try these settings:
-# os.environ['MUJOCO_GL'] = 'egl'  # 或者 'osmesa' 用于软件渲染
+# os.environ['MUJOCO_GL'] = 'egl'  # or 'osmesa' for software rendering
 # os.environ['PYOPENGL_PLATFORM'] = 'egl'
 
 import rclpy
@@ -16,14 +16,14 @@ import time
 import sys
 from pathlib import Path
 
-# 添加环境路径
+# Add environment path
 env_path = Path(__file__).parent
 sys.path.insert(0, str(env_path))
 
 from bimanual_env import BimanualXArm7Env
 from pathlib import Path
 
-# 添加环境路径
+# Add environment path
 env_path = Path(__file__).parent.parent / "banana_learning/banana_learning/ours/envs"
 sys.path.insert(0, str(env_path))
 
@@ -31,19 +31,19 @@ from bimanual_env import BimanualXArm7Env
 
 class XArmMujocoSimNode(Node):
     """
-    基于BimanualXArm7Env的XArm双臂MuJoCo仿真节点
-    订阅: /gello/left/joint_command, /gello/right/joint_command
-    发布: /xarm/left/joint_angle, /xarm/left/joint_current, /xarm/left/gripper_opening
-          /xarm/right/joint_angle, /xarm/right/joint_current, /xarm/right/gripper_opening
+    XArm dual-arm MuJoCo simulation node based on BimanualXArm7Env
+    Subscribes to: /gello/left/joint_command, /gello/right/joint_command
+    Publishes: /xarm/left/joint_angle, /xarm/left/joint_current, /xarm/left/gripper_opening
+              /xarm/right/joint_angle, /xarm/right/joint_current, /xarm/right/gripper_opening
     """
     
     def __init__(self):
         super().__init__('xarm_mujoco_sim_node')
         
-        # 初始化MuJoCo环境
+        # Initialize MuJoCo environment
         self.init_env()
         
-        # 创建订阅者
+        # Create subscribers
         self.left_cmd_sub = self.create_subscription(
             Float64MultiArray,
             '/gello/left/joint_command',
@@ -58,7 +58,7 @@ class XArmMujocoSimNode(Node):
             10
         )
         
-        # 创建发布者
+        # Create publishers
         self.left_joint_pub = self.create_publisher(Float64MultiArray, '/xarm/left/joint_angle', 10)
         self.left_current_pub = self.create_publisher(Float64MultiArray, '/xarm/left/joint_current', 10)
         self.left_gripper_pub = self.create_publisher(Float64MultiArray, '/xarm/left/gripper_opening', 10)
@@ -67,131 +67,131 @@ class XArmMujocoSimNode(Node):
         self.right_current_pub = self.create_publisher(Float64MultiArray, '/xarm/right/joint_current', 10)
         self.right_gripper_pub = self.create_publisher(Float64MultiArray, '/xarm/right/gripper_opening', 10)
         
-        # 控制命令缓存
-        self.left_command = np.zeros(8)  # 7关节 + 1夹爪
+        # Control command cache
+        self.left_command = np.zeros(8)  # 7 joints + 1 gripper
         self.right_command = np.zeros(8)
         self.command_lock = threading.Lock()
         
-        # 启动仿真线程
+        # Start simulation thread
         self.sim_thread = threading.Thread(target=self.simulation_loop, daemon=True)
         self.sim_running = True
         self.sim_thread.start()
         
-        # 状态发布定时器 (50Hz)
+        # State publishing timer (50Hz)
         self.state_timer = self.create_timer(0.02, self.publish_states)
         
-        self.get_logger().info("XArm MuJoCo仿真节点已启动")
+        self.get_logger().info("XArm MuJoCo simulation node started")
     
     def init_env(self):
-        """初始化MuJoCo环境"""
+        """Initialize MuJoCo environment"""
         try:
-            # 创建BimanualXArm7环境 (启用可视化)
+            # Create BimanualXArm7 environment (with visualization enabled)
             self.env = BimanualXArm7Env(
                 use_grippers=True,
-                render_mode='human'  # 启用可视化
+                render_mode='human'  # Enable visualization
             )
             
-            # 重置环境
+            # Reset environment
             obs, info = self.env.reset()
             
-            self.get_logger().info(f"MuJoCo环境初始化成功")
-            self.get_logger().info(f"状态维度: {self.env.state_dim}")
-            self.get_logger().info(f"动作维度: {self.env.action_dim}")
-            self.get_logger().info(f"模型qpos维度: {self.env.model.nq}")
-            self.get_logger().info(f"模型actuator维度: {self.env.model.nu}")
+            self.get_logger().info(f"MuJoCo environment initialized successfully")
+            self.get_logger().info(f"State dimension: {self.env.state_dim}")
+            self.get_logger().info(f"Action dimension: {self.env.action_dim}")
+            self.get_logger().info(f"Model qpos dimension: {self.env.model.nq}")
+            self.get_logger().info(f"Model actuator dimension: {self.env.model.nu}")
             
         except Exception as e:
-            self.get_logger().error(f"环境初始化失败: {e}")
-            # 如果可视化失败，尝试无头模式
+            self.get_logger().error(f"Environment initialization failed: {e}")
+            # If visualization fails, try headless mode
             try:
-                self.get_logger().warn("尝试无头模式...")
+                self.get_logger().warn("Trying headless mode...")
                 self.env = BimanualXArm7Env(
                     use_grippers=True,
-                    render_mode=None  # 无头模式
+                    render_mode=None  # Headless mode
                 )
                 obs, info = self.env.reset()
-                self.get_logger().info("无头模式初始化成功")
+                self.get_logger().info("Headless mode initialization successful")
             except Exception as e2:
-                self.get_logger().error(f"无头模式也失败: {e2}")
+                self.get_logger().error(f"Headless mode also failed: {e2}")
                 raise
     
     def left_command_callback(self, msg):
-        """左臂命令回调"""
+        """Left arm command callback"""
         with self.command_lock:
             if len(msg.data) >= 7:
-                # 确保数组长度为8，如果只有7个关节，夹爪保持当前值
+                # Ensure array length is 8, if only 7 joints, keep current gripper value
                 self.left_command[:len(msg.data)] = msg.data[:8]
                 if len(msg.data) == 7:
-                    # 如果只有7个关节，夹爪设为中间位置
-                    self.left_command[7] = 127.5  # 夹爪中间位置 (0-255范围)
+                    # If only 7 joints, set gripper to middle position
+                    self.left_command[7] = 127.5  # Gripper middle position (0-255 range)
                 elif len(msg.data) == 8:
-                    # 如果有8个值（包含夹爪），将夹爪值从0-1范围映射到0-255范围
-                    # 注意：leader arm的gr_val=0表示fully open, gr_val=1表示fully closed
-                    # MuJoCo的0=fully closed, 255=fully open
+                    # If 8 values (including gripper), map gripper value from 0-1 range to 0-255 range
+                    # Note: leader arm gr_val=0 means fully open, gr_val=1 means fully closed
+                    # MuJoCo 0=fully closed, 255=fully open
                     gripper_val = msg.data[7]  # 0-1 range from leader arm
-                    # 修正映射：leader的1(closed) -> MuJoCo的255(closed), leader的0(open) -> MuJoCo的0(open)
+                    # Correct mapping: leader's 1(closed) -> MuJoCo's 255(closed), leader's 0(open) -> MuJoCo's 0(open)
                     self.left_command[7] = gripper_val * 255.0
         
 
     
     def right_command_callback(self, msg):
-        """右臂命令回调"""
+        """Right arm command callback"""
         with self.command_lock:
             if len(msg.data) >= 7:
-                # 确保数组长度为8，如果只有7个关节，夹爪保持当前值
+                # Ensure array length is 8, if only 7 joints, keep current gripper value
                 self.right_command[:len(msg.data)] = msg.data[:8]
                 if len(msg.data) == 7:
-                    # 如果只有7个关节，夹爪设为中间位置
-                    self.right_command[7] = 127.5  # 夹爪中间位置
+                    # If only 7 joints, set gripper to middle position
+                    self.right_command[7] = 127.5  # Gripper middle position
                 elif len(msg.data) == 8:
-                    # 如果有8个值（包含夹爪），将夹爪值从0-1范围映射到0-255范围
-                    # 注意：leader arm的gr_val=0表示fully open, gr_val=1表示fully closed
-                    # MuJoCo的0=fully closed, 255=fully open
+                    # If 8 values (including gripper), map gripper value from 0-1 range to 0-255 range
+                    # Note: leader arm gr_val=0 means fully open, gr_val=1 means fully closed
+                    # MuJoCo 0=fully closed, 255=fully open
                     gripper_val = msg.data[7]  # 0-1 range from leader arm
-                    # 修正映射：leader的1(closed) -> MuJoCo的255(closed), leader的0(open) -> MuJoCo的0(open)
+                    # Correct mapping: leader's 1(closed) -> MuJoCo's 255(closed), leader's 0(open) -> MuJoCo's 0(open)
                     self.right_command[7] = gripper_val * 255.0
         
 
     
     def simulation_loop(self):
-        """仿真主循环 (100Hz)"""
+        """Main simulation loop (100Hz)"""
         dt = 0.01  # 10ms
         
         while self.sim_running:
             start_time = time.time()
             
-            # 构建完整的动作向量
+            # Build complete action vector
             with self.command_lock:
-                # 组合左臂和右臂命令 [left_7joints, left_gripper, right_7joints, right_gripper]
+                # Combine left and right arm commands [left_7joints, left_gripper, right_7joints, right_gripper]
                 action = np.concatenate([
-                    self.left_command,   # 左臂7关节 + 夹爪
-                    self.right_command   # 右臂7关节 + 夹爪
+                    self.left_command,   # Left arm 7 joints + gripper
+                    self.right_command   # Right arm 7 joints + gripper
                 ])
             
-            # 执行环境步进
+            # Execute environment step
             try:
                 obs, reward, done, truncated, info = self.env.step(action)
                 
-                # 渲染显示
+                # Render display
                 self.env.render()
                 
             except Exception as e:
-                self.get_logger().warn(f"仿真步进错误: {e}")
+                self.get_logger().warn(f"Simulation step error: {e}")
             
-            # 控制仿真频率
+            # Control simulation frequency
             elapsed = time.time() - start_time
             sleep_time = max(0, dt - elapsed)
             if sleep_time > 0:
                 time.sleep(sleep_time)
     
     def get_joint_positions(self):
-        """获取关节位置"""
+        """Get joint positions"""
         try:
-            # 从环境获取关节位置
+            # Get joint positions from environment
             if self.env.use_grippers:
-                # 左臂7关节
+                # Left arm 7 joints
                 left_joints = self.env.data.qpos[:8]
-                # 右臂7关节  
+                # Right arm 7 joints  
                 right_joints = self.env.data.qpos[9:16]
             else:
                 left_joints = self.env.data.qpos[:7]
@@ -199,44 +199,44 @@ class XArmMujocoSimNode(Node):
             
             return left_joints, right_joints
         except Exception as e:
-            self.get_logger().warn(f"获取关节位置失败: {e}")
+            self.get_logger().warn(f"Failed to get joint positions: {e}")
             return np.zeros(7), np.zeros(7)
     
     def get_gripper_positions(self):
-        """获取夹爪位置"""
+        """Get gripper positions"""
         try:
-            # 默认夹爪位置
+            # Default gripper positions
             left_gripper_pos = 0.0
             right_gripper_pos = 0.0
             
-            # 从环境获取夹爪位置
+            # Get gripper positions from environment
             if self.env.use_grippers:
                 n_qpos = self.env.model.nq
                 if n_qpos > 7:
-                    left_gripper_pos = self.env.data.qpos[7]  # 左夹爪
+                    left_gripper_pos = self.env.data.qpos[7]  # Left gripper
                 if n_qpos > 15:
-                    right_gripper_pos = self.env.data.qpos[15]  # 右夹爪
+                    right_gripper_pos = self.env.data.qpos[15]  # Right gripper
                 
-                # 将夹爪位置从MuJoCo的0-255范围转换回0-1范围用于发布
-                # MuJoCo的0=fully closed, 255=fully open
-                # 修正映射：转换为0=fully open, 1=fully closed (与leader arm一致)
+                # Convert gripper position from MuJoCo's 0-255 range back to 0-1 range for publishing
+                # MuJoCo 0=fully closed, 255=fully open
+                # Correct mapping: convert to 0=fully open, 1=fully closed (consistent with leader arm)
                 left_gripper_pos = left_gripper_pos / 255.0
                 right_gripper_pos = right_gripper_pos / 255.0
             
             return left_gripper_pos, right_gripper_pos
         except Exception as e:
-            self.get_logger().warn(f"获取夹爪位置失败: {e}")
+            self.get_logger().warn(f"Failed to get gripper positions: {e}")
             return 0.0, 0.0
     
     def get_joint_currents(self):
-        """计算关节电流 (基于力矩)"""
+        """Calculate joint currents (based on torques)"""
         try:
             n_actuators = self.env.model.nu
             
             if n_actuators >= 16:
-                # 从actuator force计算电流
-                left_currents = self.env.data.actuator_force[:8].copy()  # 左臂7关节+夹爪
-                right_currents = self.env.data.actuator_force[8:16].copy()  # 右臂7关节+夹爪
+                # Calculate current from actuator force
+                left_currents = self.env.data.actuator_force[:8].copy()  # Left arm 7 joints + gripper
+                right_currents = self.env.data.actuator_force[8:16].copy()  # Right arm 7 joints + gripper
             elif n_actuators >= 8:
                 left_currents = self.env.data.actuator_force[:8].copy()
                 right_currents = np.zeros(8)
@@ -246,37 +246,37 @@ class XArmMujocoSimNode(Node):
                 if n_actuators > 0:
                     left_currents[:n_actuators] = self.env.data.actuator_force[:n_actuators]
             
-            # 简单的力矩到电流转换 (可根据实际需要调整)
-            current_scale = 0.1  # 转换系数
+            # Simple torque to current conversion (can be adjusted as needed)
+            current_scale = 0.1  # Conversion factor
             left_currents *= current_scale
             right_currents *= current_scale
             
             return left_currents, right_currents
         except Exception as e:
-            self.get_logger().warn(f"获取关节电流失败: {e}")
+            self.get_logger().warn(f"Failed to get joint currents: {e}")
             return np.zeros(8), np.zeros(8)
     
     def publish_states(self):
-        """发布机器人状态"""
+        """Publish robot states"""
         try:
-            # 获取关节角度
+            # Get joint angles
             left_joints, right_joints = self.get_joint_positions()
             
-            # 获取夹爪位置
+            # Get gripper positions
             left_gripper, right_gripper = self.get_gripper_positions()
             
-            # 获取关节电流
+            # Get joint currents
             left_currents, right_currents = self.get_joint_currents()
             
-            # 调试信息：打印夹爪状态
+            # Debug info: print gripper status
             if hasattr(self, '_last_gripper_debug_time'):
-                if time.time() - self._last_gripper_debug_time > 1.0:  # 每秒打印一次
+                if time.time() - self._last_gripper_debug_time > 1.0:  # Print once per second
                     
                     self._last_gripper_debug_time = time.time()
             else:
                 self._last_gripper_debug_time = time.time()
             
-            # 发布左臂状态
+            # Publish left arm state
             left_joint_msg = Float64MultiArray()
             left_joint_msg.data = left_joints.tolist()
             self.left_joint_pub.publish(left_joint_msg)
@@ -289,7 +289,7 @@ class XArmMujocoSimNode(Node):
             left_gripper_msg.data = [left_gripper]
             self.left_gripper_pub.publish(left_gripper_msg)
             
-            # 发布右臂状态
+            # Publish right arm state
             right_joint_msg = Float64MultiArray()
             right_joint_msg.data = right_joints.tolist()
             self.right_joint_pub.publish(right_joint_msg)
@@ -303,10 +303,10 @@ class XArmMujocoSimNode(Node):
             self.right_gripper_pub.publish(right_gripper_msg)
             
         except Exception as e:
-            self.get_logger().warn(f"发布状态失败: {e}")
+            self.get_logger().warn(f"Failed to publish states: {e}")
     
     def destroy_node(self):
-        """清理资源"""
+        """Clean up resources"""
         self.sim_running = False
         if self.sim_thread.is_alive():
             self.sim_thread.join(timeout=1.0)
@@ -315,7 +315,7 @@ class XArmMujocoSimNode(Node):
             if hasattr(self, 'env'):
                 self.env.close()
         except Exception as e:
-            self.get_logger().warn(f"关闭环境失败: {e}")
+            self.get_logger().warn(f"Failed to close environment: {e}")
         
         super().destroy_node()
 
@@ -326,12 +326,12 @@ def main(args=None):
     node = None
     try:
         node = XArmMujocoSimNode()
-        node.get_logger().info("仿真节点启动成功，等待Gello命令...")
+        node.get_logger().info("Simulation node started successfully, waiting for Gello commands...")
         rclpy.spin(node)
     except KeyboardInterrupt:
-        print("仿真节点已停止")
+        print("Simulation node stopped")
     except Exception as e:
-        print(f"仿真节点错误: {e}")
+        print(f"Simulation node error: {e}")
         import traceback
         traceback.print_exc()
     finally:
