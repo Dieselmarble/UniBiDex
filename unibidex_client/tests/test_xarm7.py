@@ -4,9 +4,9 @@ import time
 from unibidex_client.motion_control.xarm7 import XArm7_Hand
 
 def main():
-    # 1. 用你的机械臂网络地址替换下面的 IP/串口
+    # 1. Replace the IP/serial port below with your robot arm's network address
     ARM_IP = "192.168.100.203"
-    HAND_TTY = "/dev/ttyUSB0"   # 如果只控制机械臂此字段可留空
+    HAND_TTY = "/dev/ttyUSB0"   # This field can be left empty if only controlling the robot arm
 
     # 2. 初始化 XArm7Ability，只打开机械臂控制
     arm = XArm7_Hand(

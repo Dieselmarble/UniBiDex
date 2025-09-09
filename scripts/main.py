@@ -9,7 +9,7 @@ from unibidex_core.agents.unibidex_agent import UniBiDexAgent
 from unibidex_core.data_utils.format_obs import save_frame
 import rclpy
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Float64MultiArray  # 用于发布关节命令
+from std_msgs.msg import Float64MultiArray  # For publishing joint commands
 
 def print_color(*args, color=None, attrs=(), **kwargs):
     import termcolor
@@ -29,7 +29,7 @@ class Args:
     bimanual: bool = False
     verbose: bool = False
 
-    # ROS 通信配置
+    # ROS communication configuration
     ros_state_topic:   str = "/unibidex/joint_states"
 
 
@@ -40,11 +40,11 @@ def main(args: Args):
         rclpy.init()
         node = rclpy.create_node('unibidex_control_node')
 
-        # 1) 初始化数据容器
+        # 1) Initialize data containers
         obs_container = {'joints': None}
         current_container = {'left': None, 'right': None}
 
-        # 2) 定义所有回调
+        # 2) Define all callbacks
         def state_cb(msg: JointState):
             obs_container['joints'] = np.array(msg.position)
 

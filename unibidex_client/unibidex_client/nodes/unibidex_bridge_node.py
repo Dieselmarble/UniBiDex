@@ -13,11 +13,11 @@ class UniBiDexBridgeNode(Node):
         self.teleop_data = teleop_data
         self.bridge = CvBridge()
 
-        # 1) 关节命令
+        # 1) Joint commands
         self.create_subscription(Float64MultiArray, 'unibidex/left/joint_command',  self._cmd_left,  10)
         self.create_subscription(Float64MultiArray, 'unibidex/right/joint_command', self._cmd_right, 10)
 
-        # 3) 电流与角度发布
+        # 3) Current and angle publishing
         self.left_current_pub  = self.create_publisher(Float64MultiArray, 'xarm/left/joint_current',  10)
         self.right_current_pub = self.create_publisher(Float64MultiArray, 'xarm/right/joint_current', 10)
         self.left_angle_pub    = self.create_publisher(Float64MultiArray, 'xarm/left/joint_angle',    10)
@@ -26,7 +26,7 @@ class UniBiDexBridgeNode(Node):
         self.right_gripper_pub = self.create_publisher(Float64, 'xarm/right/gripper_opening', 10)
         self.create_timer(1.0/feedback_hz, self._publish_feedback)
 
-        # 打开 Debug 级别，查看每帧 encoding
+        # Enable Debug level to view encoding for each frame
         self.get_logger().info("UniBiDexBridgeNode initialized.")
 
     # ——— Command callbacks ———

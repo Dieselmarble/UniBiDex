@@ -31,10 +31,10 @@ class TeleopBridgeNode(Node):
         self.create_subscription(PoseStamped, 'retargeting/hand/right/ee_pose', self._right_pose_cb, 10)
         self.create_subscription(Bool, 'retargeting/gripper/left/command', self._left_gripper_cb, 10)
         self.create_subscription(Bool, 'retargeting/gripper/right/command', self._right_gripper_cb, 10)
-        # 加入 joystick/rotate
+        # Add joystick/rotate
         self.create_subscription(Float32, 'retargeting/rotate/left', self._left_rotate_cb, 10)
         self.create_subscription(Float32, 'retargeting/rotate/right', self._right_rotate_cb, 10)
-        # 加入 joystick axis
+        # Add joystick axis
         self.create_subscription(Float32MultiArray, 'retargeting/joystick/left', self._left_joystick_cb, 10)
         self.create_subscription(Float32MultiArray, 'retargeting/joystick/right', self._right_joystick_cb, 10)
 
@@ -101,7 +101,7 @@ def run_controller_proc(controller_config, teleop_data, side):
                axes       = teleop_data.get("right_joystick",[0.0,0.0])
            if pose_msg is not None:
                 curr_ctrl_se3 = make_se3(pose_msg)
-                # 假设controller支持step_with_external_state(curr_ctrl_se3, rotate_q7, gripper_cmd, joystick)
+                # Assume controller supportsstep_with_external_state(curr_ctrl_se3, rotate_q7, gripper_cmd, joystick)
                 controller.step_with_external_state(
                     curr_ctrl_se3,
                     axes,
@@ -124,7 +124,7 @@ def main():
     bridge_node = TeleopBridgeNode(teleop_data)
     logger.info("TeleopBridgeNode initialized.")
 
-    # 启动左右臂进程
+    # Start left and right arm processes
     p_left = multiprocessing.Process(target=run_controller_proc, args=(left_config, teleop_data, "left"), daemon=True)
     p_right = multiprocessing.Process(target=run_controller_proc, args=(right_config, teleop_data, "right"), daemon=True)
     p_left.start()

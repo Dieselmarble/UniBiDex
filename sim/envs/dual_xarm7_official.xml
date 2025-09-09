@@ -89,17 +89,17 @@
     <!-- Ground plane -->
     <geom name="floor" size="0 0 0.125" type="plane" material="grid"/>
     
-    <!-- Robot base table (底座桌子) -->
+    <!-- Robot base table (base table) -->
     <body name="base_table" pos="0 0 0.43">
       <geom name="base_table_geom" type="box" size="0.30 0.10 0.02" rgba="0.4 0.4 0.4 1" material="plastic"/>
     </body>
     
-    <!-- Work table (工作桌面，比底座高8cm) -->
+    <!-- Work table (work surface, 8cm higher than base) -->
     <body name="work_table" pos="0 0.5 0.30">
       <geom name="work_table_geom" type="box" size="0.8 0.4 0.02" rgba="0.6 0.4 0.2 1" material="plastic"/>
     </body>
     
-    <!-- Left XArm-7 (底座中心点在0.235, 0, 0.42, 朝向前方桌子) -->
+    <!-- Left XArm-7 (base center at 0.235, 0, 0.42, facing forward table) -->
     <body name="left_base" pos="0.235 0 0.42" quat="0.7071068 0 0 0.7071068" childclass="xarm7">
       <inertial pos="-0.021131 -0.0016302 0.056488" quat="0.696843 0.20176 0.10388 0.680376" mass="0.88556"
         diaginertia="0.00382023 0.00335282 0.00167725"/>

@@ -105,12 +105,12 @@ class SingleArmTeleopController:
         self.teleop_node = teleop_node
 
         # ---- Adaptive scaling params ----
-        self.min_translation_scale = 0.2    # 精细操作时的放大
-        self.max_translation_scale = 1.5    # 粗调放大
-        self.ref_translation_speed = 0.06   # m/s, 超过此速度则放大到最大
+        self.min_translation_scale = 0.2    # Amplification for fine operations
+        self.max_translation_scale = 1.5    # Coarse adjustment amplification
+        self.ref_translation_speed = 0.06   # m/s, Amplify to maximum when exceeding this speed
 
-        self.min_rotation_scale = 0.4       # 精细旋转放大
-        self.max_rotation_scale = 1.2       # 粗调旋转放大
+        self.min_rotation_scale = 0.4       # Fine rotation amplification
+        self.max_rotation_scale = 1.2       # Coarse rotation amplification
         self.ref_rotation_speed = 0.10      # rad/s, 超过此速度则旋转放大到最大
 
         self._last_ctrl_p = None            # 存储上一帧手柄位置

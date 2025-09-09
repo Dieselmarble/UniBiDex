@@ -80,7 +80,7 @@ PORT_CONFIG_MAP: Dict[str, DynamixelRobotConfig] = {
 class UniBiDexAgent(Agent):
     def _init_current_buffer(self):
         self._last_currents = None
-        self._current_alpha = 0.2  # 平滑系数，可调
+        self._current_alpha = 0.2  # Smoothing coefficient, adjustable
     def __init__(
         self,
         port: str,
@@ -155,7 +155,7 @@ class UniBiDexAgent(Agent):
         joint_pos, joint_vel = self._robot._driver.get_positions_and_velocities()
         currents_in = obs.get('currents', np.zeros(self._robot.num_dofs()))
 
-        # --- 平滑过渡 ---
+        # --- Smooth Transition ---
         if self._last_currents is None:
             smoothed_currents = currents_in.copy()
         else:
@@ -163,7 +163,7 @@ class UniBiDexAgent(Agent):
         self._last_currents = smoothed_currents.copy()
 
         torque_cmd = self.xarm_current_to_xl330_cmd(smoothed_currents)
-        # 放大最后两个关节的命令
+        # Amplify commands for the last two joints
         # if torque_cmd.size >= 2:
         #     torque_cmd[-2:] = torque_cmd[-2:] * 2.0
         torque_cmd += self.friction_compensation(joint_vel)

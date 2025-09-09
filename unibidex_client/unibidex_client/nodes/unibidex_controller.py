@@ -27,9 +27,9 @@ def load_config(config_path: str):
 
 class SingleUniBiDexController:
     """
-    子进程级控制器封装：
-      - 初始化 Pinocchio 控制器 + Robotiq
-      - 异步执行夹爪命令，避免阻塞
+    Sub-process level controller wrapper:
+      - Initialize Pinocchio controller + Robotiq
+      - Execute gripper commands asynchronously to avoid blocking
       - step_with_external_state 只做非阻塞的 gripper 调度
     """
     def __init__(self, ctrl_cfg, side: str):

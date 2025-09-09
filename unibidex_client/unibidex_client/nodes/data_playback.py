@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Parallel playback 双臂 teleop 数据：
-- 顺序读取每帧左右臂关节命令
-- 可选显示遥操作图像
-- 双臂控制初始化 & 控制均可并行
-- --mode=real 驱动真机；--mode=print 仅打印
+Parallel playback dual-arm teleop data：
+- Sequentially read left and right arm joint commands for each frame
+- Optionally display teleoperation images
+- Dual-arm control initialization & All controls can be parallel
+- --mode=real Drive real robot；--mode=print Print only
 """
 import argparse
 import time
@@ -36,7 +36,7 @@ def main():
     )
     parser.add_argument(
         "--mode", choices=["real", "print"], default="print",
-        help="模式: 'real' 驱动真机; 'print' 仅打印"
+        help="模式: 'real' Drive real robot; 'print' Print only"
     )
     parser.add_argument(
         "--show-images", action="store_true",
@@ -56,7 +56,7 @@ def main():
     num_frames = cmds.shape[0]
     print(f"Loaded {num_frames} frames from {args.zarr_path}")
 
-    # 初始化图像显示窗口
+    # Initialization图像显示窗口
     window_names = ['left_wrist', 'right_wrist', 'front']
     if show_images and imgs is not None:
         for win in window_names:
@@ -65,7 +65,7 @@ def main():
     left_ctrl = right_ctrl = None
     executor = None
 
-    # 根据模式初始化控制器与线程池
+    # 根据模式Initialization控制器与线程池
     if mode == 'real':
         if not args.config:
             parser.error("--config 参数在 real 模式下为必需")
@@ -73,7 +73,7 @@ def main():
         left_cfg  = config['controllers']['left']
         right_cfg = config['controllers']['right']
 
-        # 并行初始化左右臂控制器
+        # 并行Initialization左右臂控制器
         with ThreadPoolExecutor(max_workers=2) as init_pool:
             init_futs = {
                 init_pool.submit(SingleGelloController, left_cfg, 'left'): 'left',
@@ -88,12 +88,12 @@ def main():
                     else:
                         right_ctrl = ctrl
                 except Exception as e:
-                    logger.error(f"{side} 控制器初始化失败: {e}")
+                    logger.error(f"{side} 控制器Initialization失败: {e}")
                     sys.exit(1)
         executor = ThreadPoolExecutor(max_workers=2)
         print("Real mode: controllers parallel initialized.")
     else:
-        print("Print-only mode: 不执行控制，仅打印回放信息。")
+        print("Print-only mode: 不执行控制，Print only回放信息。")
 
     prev_t = None
     try:

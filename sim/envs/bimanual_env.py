@@ -70,15 +70,15 @@ class BimanualXArm7Env(gym.Env):
             })
         })
         
-        # XArm-7 joint limits (从XML文件中的ctrlrange提取) - 先定义关节限制
+        # XArm-7 joint limits (extracted from ctrlrange in XML file) - define joint limits first
         self.left_joint_limits = np.array([
-            [-6.28319, 6.28319],    # j1 (默认范围)
+            [-6.28319, 6.28319],    # j1 (default range)
             [-2.059, 2.0944],       # j2  
-            [-6.28319, 6.28319],    # j3 (默认范围)
+            [-6.28319, 6.28319],    # j3 (default range)
             [-0.19198, 3.927],      # j4
-            [-6.28319, 6.28319],    # j5 (默认范围)
+            [-6.28319, 6.28319],    # j5 (default range)
             [-1.69297, 3.14159],    # j6
-            [-6.28319, 6.28319],    # j7 (默认范围)
+            [-6.28319, 6.28319],    # j7 (default range)
         ])
         
         self.right_joint_limits = self.left_joint_limits.copy()

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # filepath: banana_learning/banana_learning/ours/envs/xarm_mujoco_sim.py
 
-# 设置环境变量以获得更好的显示兼容性
+# Set environment variables for better display compatibility
 import os
-# 如果遇到GLX错误，可以尝试以下设置：
+# If you encounter GLX errors, try these settings:
 # os.environ['MUJOCO_GL'] = 'egl'  # 或者 'osmesa' 用于软件渲染
 # os.environ['PYOPENGL_PLATFORM'] = 'egl'
 

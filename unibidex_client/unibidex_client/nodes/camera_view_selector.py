@@ -171,9 +171,9 @@ def main():
         print('No USB Camera found in lsusb')
         return
     devices = []
-    # new: 只拿每个物理口的“index0”那一路
+    # new: Only take from each physical port“index0”那一路
     for entry in sorted(glob.glob('/dev/v4l/by-path/*-video-index0')):
-        # 真实设备节点 /dev/videoX
+        # Real device node /dev/videoX
         dev = os.path.realpath(entry)
         did = get_device_id(dev)
         if did and did in usb_ids:

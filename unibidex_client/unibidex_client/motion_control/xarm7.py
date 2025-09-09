@@ -134,7 +134,7 @@ class XArm7PinocchioController(MotionControllerBase):
         )
         self._current_thread.start()
 
-        # —— 新增：启动看门狗线程 ——
+        # —— Added: Start watchdog thread ——
         self._stop_watchdog = False
         self._watchdog_thread = threading.Thread(
             target=self._watchdog_loop, daemon=True
@@ -166,7 +166,7 @@ class XArm7PinocchioController(MotionControllerBase):
         logger.info("xArm reset and PID cleared.")
 
     def _current_poll_loop(self):
-        """后台不断读取关节电流并存入 self._currents"""
+        """Continuously read joint currents in background and store in self._currents"""
         while not self._stop_current_thread:
             code, state = self.arm.get_joint_states(is_radian=True)
             if code == 0 and len(state) >= 3:
@@ -174,16 +174,16 @@ class XArm7PinocchioController(MotionControllerBase):
                 with self._current_lock:
                     self._currents[:] = cur
             else:
-                logger.warning("电流读取失败，code=%s state=%s", code, state)
+                logger.warning("Current reading failed, code=%s state=%s", code, state)
             time.sleep(self.inner_dt)
 
-    # —— 新增：看门狗线程方法 ——
+    # —— Added: Watchdog thread method ——
     def _watchdog_loop(self):
         """
-        定期检查末端执行器是否在安全球体内，
-        如果越界则执行紧急停机。
+        Periodically check if the end effector is within the safety sphere,
+        and executes emergency stop if out of bounds.
         """
-        check_interval = 0.05  # 每 50ms 检查一次
+        check_interval = 0.05  # Check every 50ms
         while not self._stop_watchdog:
             try:
                 tcp = self.get_current_tcp_pose()
@@ -191,24 +191,24 @@ class XArm7PinocchioController(MotionControllerBase):
                 dist = np.linalg.norm(pos - self.safety_center)
                 if dist > self.safety_radius:
                     logger.error(
-                        f"EE 超出安全半径！距离中心 {dist:.3f} m (限值 {self.safety_radius} m)，执行紧急停机。"
+                        f"EE exceeds safety radius! Distance from center {dist:.3f} m (limit {self.safety_radius} m), executing emergency stop."
                     )
                     self.arm.motion_enable(False)  # XArmAPI 紧急停机
                     break
             except Exception as e:
-                logger.warning(f"看门狗线程出错: {e}")
+                logger.warning(f"Watchdog thread error: {e}")
             time.sleep(check_interval)
 
     def stop(self):
         if not self.use_arm:
             return
-        # 停止控制与电流监测线程
+        # Stop control and current monitoring threads
         self._stop_flag = True
         self._arm_thread.join()
         self._stop_current_thread = True
         self._current_thread.join()
 
-        # —— 新增：停止并等待看门狗线程结束 ——
+        # —— Added: Stop and wait for watchdog thread to end ——
         self._stop_watchdog = True
         self._watchdog_thread.join()
 
@@ -300,4 +300,3 @@ class XArm7PinocchioController(MotionControllerBase):
             self._arm_target = angles.copy()
         logger.info(f"Set servo angles: {angles}")
 
-    # ...（其余方法保持不变）...

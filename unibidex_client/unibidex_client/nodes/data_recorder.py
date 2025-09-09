@@ -16,7 +16,7 @@ from message_filters import Subscriber, ApproximateTimeSynchronizer
 
 
 class DataRecorder(Node):
-    """使用 ApproximateTimeSynchronizer 同步七路话题，并写入 Zarr。"""
+    """Use ApproximateTimeSynchronizer to sync seven topics and write to Zarr。"""
     def __init__(self, zarr_path: str = None, slop: float = 0.05, queue_size: int = 500):
         super().__init__('data_recorder')
         self.bridge = CvBridge()
@@ -24,7 +24,7 @@ class DataRecorder(Node):
         self._initialized = False
         self._start_time = time.time()
 
-        # Zarr 初始化
+        # Zarr Initialization
         if zarr_path is None:
             ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
             zarr_path = os.path.expanduser(f'~/Desktop/teleop_data_{ts}.zarr')
@@ -53,7 +53,7 @@ class DataRecorder(Node):
         self.get_logger().info(f'ApproximateTimeSynchronizer ready (slop={slop}s, queue={queue_size}).')
 
     def _initialize_datasets(self, joint_dim: int):
-        """根据关节维度动态创建 Zarr datasets。"""
+        """Dynamically create Zarr datasets based on joint dimensions。"""
         self._root.create_dataset('commands',
             shape=(0, 2, joint_dim), chunks=(1,2,joint_dim),
             dtype='f4', compressor=zarr.Blosc())
@@ -81,8 +81,8 @@ class DataRecorder(Node):
                        img_l_msg: Image,
                        img_r_msg: Image,
                        img_f_msg: Image):
-        """当一组近似同步的消息到齐时调用，写入一帧。"""
-        # 初始化 datasets（只在第一次）
+        """Called when a group of approximately synchronized messages arrive, write one frame。"""
+        # Initialization datasets（Only on first time）
         if not self._initialized:
             dim = len(l_cmd_msg.data)
             self._initialize_datasets(dim)
