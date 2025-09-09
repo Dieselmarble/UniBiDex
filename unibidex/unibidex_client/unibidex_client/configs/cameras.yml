@@ -1,0 +1,7 @@
+camera_devices:
+  left_wrist: "/dev/camera_left_wrist"
+  right_wrist: "/dev/camera_right_wrist"
+  front: "/dev/camera_front"
+  # left: "/dev/camera_left"
+  # right: "/dev/camera_right"
+fps: 30

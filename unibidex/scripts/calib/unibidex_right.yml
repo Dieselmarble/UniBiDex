@@ -1,0 +1,7 @@
+port: /dev/serial/by-id/usb-FTDI_USB__-__Serial_Converter_FTAUZ35W-if00-port0
+baudrate: 4000000
+start_joints: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+joint_signs: [1, 1, 1, 1, 1, 1, 1]
+# Optional:
+joint_ids: [9,10,11,12,13,14,15,16]
+gripper: true

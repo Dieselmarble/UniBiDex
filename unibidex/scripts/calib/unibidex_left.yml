@@ -1,0 +1,7 @@
+port: /dev/serial/by-id/usb-FTDI_USB__-__Serial_Converter_FTAJZ5RY-if00-port0
+baudrate: 4000000
+start_joints: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+joint_signs: [1, 1, 1, 1, 1, 1, 1]
+# Optional:
+joint_ids: [1,2,3,4,5,6,7,8]
+gripper: true

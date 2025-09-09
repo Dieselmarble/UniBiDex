@@ -1,0 +1,41 @@
+teleop_node:
+  hand_topic: "/quest3/bimanual_hand_detection"
+  ctrl_topic: "/quest3/bimanual_controller_state"
+  need_init: true
+  verbose: false
+  control_mode: "CONTROLLER"
+
+controllers:
+  left:
+    urdf_path: "/home/user/Documents/UniBiDex/unibidex/banana_teleoperation/assets/urdf/arms/xarm7/xarm7.urdf"
+    ee_link: "link_eef"
+    arm_ip: "192.168.100.203"
+    use_real_arm: true
+    dt: 0.05
+    translation_scale: 2.0
+    rotation_scale: 1.0
+    controller_side: "left"
+    tcp_offset:
+      translation: [0.0, 0.0, 0.174]  # Offset in meters (85 mm along z-axis)
+      rotation: [[1, 0, 0], [0, 1, 0], [0, 0, 1]]  # Identity rotation matrix
+    gripper:
+      serial: "DAK2KQF9"  # Serial number for the left gripper
+      speed: 80  # Speed for the left gripper
+      force: 20  # Force for the left gripper
+
+  right:
+    urdf_path: "/home/user/Documents/UniBiDex/unibidex/banana_teleoperation/assets/urdf/arms/xarm7/xarm7.urdf"
+    ee_link: "link_eef"
+    arm_ip: "192.168.100.201"
+    use_real_arm: true
+    dt: 0.05
+    translation_scale: 2.0
+    rotation_scale: 1.0
+    controller_side: "right"
+    tcp_offset:
+      translation: [0.0, 0.0, 0.174]  # Offset in meters (85 mm along z-axis)
+      rotation: [[1, 0, 0], [0, 1, 0], [0, 0, 1]]  # Identity rotation matrix
+    gripper:
+      serial: "DAA5H91L"  # Serial number for the right gripper
+      speed: 80  # Speed for the right gripper
+      force: 10  # Force for the right gripper
