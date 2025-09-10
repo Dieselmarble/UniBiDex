@@ -19,8 +19,8 @@
 ## 🔥 Highlights
 
 **UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through VR controllers or leader-follower arms. UniBiDex enables real-time, contact-rich dual-arm teleoperation by integrating heterogeneous input devices into a shared control stack with consistent kinematic treatment and safety guarantees.
-### Key Features
 
+### Key Features
 - 🎮 **Cross-Device Consistency**: Unified data format transformation across heterogeneous input sources (VR, haptic controllers, isomorphic arms)
 - 🛡️ **Motion Smoothness & Safety**: Null-space optimization and redundancy control for robust operation with singularity avoidance
 - 🔬 **Empirical Validation**: Proven performance in complex, long-horizon manipulation tasks like kitchen tidying scenarios
