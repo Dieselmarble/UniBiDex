@@ -5,8 +5,6 @@ import logging
 import multiprocessing
 import numpy as np
 import rclpy
-import sys
-sys.path.append('/home/user/Documents/UniBiDex/unibidex/banana_teleoperation/unibidex_client')
 from unibidex_client.motion_control.xarm7 import XArm7PinocchioController
 from unibidex_client.motion_control.gripper_2f85 import Robotiq2F85Driver
 import threading

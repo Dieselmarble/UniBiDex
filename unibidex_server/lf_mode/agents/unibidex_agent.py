@@ -1,11 +1,9 @@
 import os
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple
-
 import numpy as np
-
-from unibidex_core.agents.agent import Agent
-from unibidex_core.robots.dynamixel import DynamixelRobot
+from lf_mode.agents.agent import Agent
+from lf_mode.robots.dynamixel import DynamixelRobot
 
 
 @dataclass

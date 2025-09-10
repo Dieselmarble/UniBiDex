@@ -18,13 +18,14 @@
 
 ## 🔥 Highlights
 
-**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through VR controllers or leader-follower arms. UniBiDex enables real-time, contact-rich dual-arm teleoperation by integrating heterogeneous input devices into a shared control stack with consistent kinematic treatment and safety guarantees.
+**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through VR controllers or leader-follower arms. UniBiDex features a modular server-client architecture that enables real-time, contact-rich dual-arm teleoperation by integrating heterogeneous input devices into a shared control stack with consistent kinematic treatment and safety guarantees.
 
 ### Key Features
 - 🎮 **Cross-Device Consistency**: Unified teleoperation algorithm across heterogeneous input sources (VR, leader-follower arms)
 - 🛡️ **Motion Smoothness & Safety**: Null-space optimization and redundancy control for robust operation with singularity avoidance
 - 🎯 **Haptic Feedback**: Current-based force feedback providing enhanced manipulation precision
-- 🔧 **Modular Design**: Extensible architecture for different robots and control algorithms
+- �️ **Server-Client Architecture**: Modular design separating control logic (server) from robot interfaces (client)
+- 🔧 **Multi-Modal Support**: Dedicated implementations for both VR and leader-follower teleoperation modes
 
 ---
 
@@ -32,27 +33,19 @@
 
 ```
 UniBiDex/
-├── 🎮 assets/                        # 3D models and calibration files
-│   ├── images/                       
-│   └── urdf/                         
+├── 🎮 assets/                        # 3D models and robot URDF files
+│   └── urdf/                         # Robot URDF models
 ├── 📜 scripts/                       # Main control scripts
-│   ├── leader_controller.py                       
-│   ├── visualize_example.py          
-│   └── calib/                        # Calibration code for the leader arm
-├── 🤖 unibidex_core/                 # Core UniBiDex framework
-│   ├── agents/                       
-│   ├── dynamixel/                    
-│   └── robots/                       
+│   ├── leader_controller.py          # Leader device controller
+│   └── calib/                        # Calibration code for leader arms
+├── 🖥️ unibidex_server/               # UniBiDex teleoperation server
+│   ├── lf_mode/                      # Leader-follower mode implementation
+│   └── vr_mode/                      # VR mode implementation
 ├── 🎛️ unibidex_client/               # Robot control client
-│   ├── motion_control/               # Motion controllers (XArm7, grippers)
-│   ├── nodes/                        # ROS2 nodes and utilities
-│   ├── configs/                      
-│   └── tests/                        
-├── � sim/                           # Simulation environments
-│   └── envs/                         
+│   └── unibidex_client/              # The follower arm controller
+├── 🌐 sim/                           # Simulation environments
+│   └── envs/                         # MuJoCo simulation environments
 └── 🔧 third_party/                   # Third-party dependencies
-    ├── DynamixelSDK/                 
-    └── mujoco_menagerie/             
 ```
 
 ---
@@ -156,10 +149,16 @@ Edit configuration files in `unibidex_client/configs/`:
    Right arm: python scripts/calib/unibidex_get_offset.py unibidex_right.yml
    ```
 
-2. **Start teleoperation**
+2. **Start teleoperation (Leader-Follower mode)**
    ```bash
-   # Main teleoperation script with bimanual control
-   python scripts/main.py
+   # Leader-follower teleoperation
+   python unibidex_server/lf_mode/main.py
+   ```
+
+3. **Start teleoperation (VR mode)**
+   ```bash
+   # VR teleoperation
+   python unibidex_server/vr_mode/main.py
    ```
 
 ### Robot Control with UniBiDex Client
@@ -180,7 +179,14 @@ Edit configuration files in `unibidex_client/configs/`:
 
 1. **Start simulation environment**
    ```bash
+   # Run MuJoCo simulation with bimanual robots
    python sim/envs/xarm_mujoco_sim.py
+   
+   # Run bimanual environment
+   python sim/envs/bimanual_env.py
+   
+   # Visualize simulation examples
+   python scripts/visualize_example.py
    ```
 
 ### Data Collection & Replay
@@ -210,7 +216,7 @@ If you find UniBiDex useful in your research, please cite our paper:
 ```bibtex
 @article{li2025unibidex,
     title   = {A Unified Teleoperation Framework for Robotic Bimanual Dexterous Manipulation},
-    author  = {Zhongxuan Li and Zeliang Guo and Jun Hu and David Navarro-Alarcon and Jia Pan and Hongmin Wu and Peng Zhou},
+    author  = {Zhongxuan Li, Zeliang Guo, Jun Hu, David Navarro-Alarcon, Jia Pan, Hongmin Wu and Peng Zhou},
     journal = {arXiv preprint arXiv:2501.XXXXX},
     year    = {2025}
 }

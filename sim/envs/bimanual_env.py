@@ -11,12 +11,8 @@ except ImportError:
 
 import time
 from typing import Dict, List, Tuple, Optional
-try:
-    import gymnasium as gym
-    from gymnasium import spaces
-except ImportError:
-    import gym
-    from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 import os
 from pathlib import Path
 

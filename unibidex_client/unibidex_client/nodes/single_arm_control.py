@@ -2,11 +2,8 @@ import time
 import threading
 import logging
 from typing import Optional
-import sys
-sys.path.append('/home/user/Documents/UniBiDex/unibidex/banana_teleoperation/unibidex_client/unibidex_client')
 import numpy as np
 import pinocchio as pin
-from pinocchio.utils import zero
 from unibidex_client.motion_control.gripper_2f85 import Robotiq2F85Driver
 from unibidex_client.motion_control.xarm7 import XArm7PinocchioController
 from unibidex_client.motion_control.base import ControlMode

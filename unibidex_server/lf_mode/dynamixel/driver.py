@@ -1,7 +1,6 @@
 import time
 from threading import Event, Lock, Thread
 from typing import Protocol, Sequence, Tuple
-
 import numpy as np
 from dynamixel_sdk.group_sync_read import GroupSyncRead
 from dynamixel_sdk.group_sync_write import GroupSyncWrite

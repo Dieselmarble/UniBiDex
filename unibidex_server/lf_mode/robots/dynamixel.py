@@ -1,9 +1,6 @@
-# Updated dynamixel.py
 from typing import Dict, Optional, Sequence, Tuple
-
 import numpy as np
-
-from gello.robots.robot import Robot
+from lf_mode.robots.robot import Robot
 
 
 class DynamixelRobot(Robot):

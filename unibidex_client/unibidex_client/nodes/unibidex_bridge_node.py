@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
-import logging
-
-import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray, Float64
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 
 class UniBiDexBridgeNode(Node):
     def __init__(self, teleop_data, feedback_hz: float = 200.0):

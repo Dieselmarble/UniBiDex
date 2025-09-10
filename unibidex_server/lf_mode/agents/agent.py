@@ -1,7 +1,5 @@
 from typing import Any, Dict, Protocol
-
 import numpy as np
-
 
 class Agent(Protocol):
     def act(self, obs: Dict[str, Any]) -> np.ndarray:

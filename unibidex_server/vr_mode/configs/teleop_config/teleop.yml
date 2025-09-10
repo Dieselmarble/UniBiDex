@@ -1,0 +1,15 @@
+# teleop_params.yaml
+teleop:
+  hand_topic: "/quest3/bimanual_hand_detection"
+  ctrl_topic: "/quest3/bimanual_controller_state"
+  control_mode: "CONTROLLER"
+  verbose: false
+  calib_n_samples: 20
+  jump_thresh: 12.8
+  rot_jump_thresh_deg: 180.0
+  ema_alpha: 0.2
+  bimanual_alignment_mode: "ALIGN_CENTER"
+  basis_map:
+    - [0, 0, 1]
+    - [-1, 0, 0]
+    - [0, 1, 0]

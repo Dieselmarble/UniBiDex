@@ -9,15 +9,13 @@ Parallel playback dual-arm teleop data:
 import argparse
 import time
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys
-
 import zarr
 import numpy as np
 import yaml
 import cv2
-
-from gello_controller import SingleGelloController
+from unibidex_controller import SingleUniBiDexController
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -76,8 +74,8 @@ def main():
         # Parallel initialize left/right controllers
         with ThreadPoolExecutor(max_workers=2) as init_pool:
             init_futs = {
-                init_pool.submit(SingleGelloController, left_cfg, 'left'): 'left',
-                init_pool.submit(SingleGelloController, right_cfg, 'right'): 'right',
+                init_pool.submit(SingleUniBiDexController, left_cfg, 'left'): 'left',
+                init_pool.submit(SingleUniBiDexController, right_cfg, 'right'): 'right',
             }
             for fut in as_completed(init_futs):
                 side = init_futs[fut]

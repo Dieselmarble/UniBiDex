@@ -7,7 +7,7 @@ from xarm import XArmAPI
 from threading import Lock
 import logging
 from typing import Optional
-from unibidex_client.motion_control.base import MotionControllerBase, ControlMode
+from .base import MotionControllerBase, ControlMode
 from pinocchio import ReferenceFrame
 
 logger = logging.getLogger(__name__)
