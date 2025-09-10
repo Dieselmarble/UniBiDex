@@ -21,7 +21,7 @@
 **UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through VR controllers or leader-follower arms. UniBiDex enables real-time, contact-rich dual-arm teleoperation by integrating heterogeneous input devices into a shared control stack with consistent kinematic treatment and safety guarantees.
 
 ### Key Features
-- 🎮 **Cross-Device Consistency**: Unified data format transformation across heterogeneous input sources (VR, haptic controllers, isomorphic arms)
+- 🎮 **Cross-Device Consistency**: Unified teleoperation algorithm across heterogeneous input sources (VR, leader-follower arms)
 - 🛡️ **Motion Smoothness & Safety**: Null-space optimization and redundancy control for robust operation with singularity avoidance
 - 🎯 **Haptic Feedback**: Current-based force feedback providing enhanced manipulation precision
 - 🔧 **Modular Design**: Extensible architecture for different robots and control algorithms
@@ -54,6 +54,30 @@ UniBiDex/
     ├── DynamixelSDK/                 
     └── mujoco_menagerie/             
 ```
+
+---
+
+## 🛠️ Configuration
+
+#### Camera Configuration
+```bash
+# Set up camera rules for consistent device naming
+cd unibidex_client
+sudo cp camera_roles.rules /etc/udev/rules.d/99-camera-roles.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+# Run camera view selector to assign camera roles
+python -m unibidex_client.nodes.camera_view_selector
+```
+
+#### Robot and Control Configuration
+Edit configuration files in `unibidex_client/configs/`:
+- `bimanual.yml`: Main bimanual control parameters
+- Robot-specific configs for XArm7 and grippers
+- Controller gains and limits
+- Safety constraints  
+- Hardware interface settings
 
 ---
 
@@ -178,31 +202,6 @@ UniBiDex/
 
 ---
 
-## 🛠️ Configuration
-
-### Hardware Setup
-
-#### Camera Configuration
-```bash
-# Set up camera rules for consistent device naming
-cd unibidex_client
-sudo cp camera_roles.rules /etc/udev/rules.d/99-camera-roles.rules
-sudo udevadm control --reload-rules
-sudo udevadm trigger
-
-# Run camera view selector to assign camera roles
-python -m unibidex_client.nodes.camera_view_selector
-```
-
-#### Robot and Control Configuration
-Edit configuration files in `unibidex_client/configs/`:
-- `bimanual.yml`: Main bimanual control parameters
-- Robot-specific configs for XArm7 and grippers
-- Controller gains and limits
-- Safety constraints  
-- Hardware interface settings
-
----
 
 ## 📝 Citation
 
