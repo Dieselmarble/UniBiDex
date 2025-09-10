@@ -23,11 +23,7 @@
 ### Key Features
 - 🎮 **Cross-Device Consistency**: Unified data format transformation across heterogeneous input sources (VR, haptic controllers, isomorphic arms)
 - 🛡️ **Motion Smoothness & Safety**: Null-space optimization and redundancy control for robust operation with singularity avoidance
-- 🔬 **Empirical Validation**: Proven performance in complex, long-horizon manipulation tasks like kitchen tidying scenarios
-- 🌐 **Robustness & Generalization**: Unified cross-modal control algorithms for enhanced imitation learning performance
 - 🎯 **Haptic Feedback**: Current-based force feedback providing enhanced manipulation precision
-- 🔧 **Cost-Effective Hardware**: Open-source hardware design using off-the-shelf components for accessibility
-- 🌐 **Comprehensive Simulation**: High-fidelity MuJoCo simulation environment for safe training and validation
 - 🔧 **Modular Design**: Extensible architecture for different robots and control algorithms
 
 ---
