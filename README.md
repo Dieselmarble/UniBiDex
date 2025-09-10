@@ -18,8 +18,7 @@
 
 ## 🔥 Highlights
 
-**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through haptic leader-follower devices. Our system addresses the fundamental challenge of transferring human bimanual dexterity to robotic systems by providing a cost-effective hardware solution, advanced control algorithms, and comprehensive simulation environment for precise, safe, and intuitive dual-arm manipulation.
-
+**UniBiDex** is a comprehensive teleoperation framework that enables **unified bimanual dexterous manipulation** through VR controllers or leader-follower arms. UniBiDex enables real-time, contact-rich dual-arm teleoperation by integrating heterogeneous input devices into a shared control stack with consistent kinematic treatment and safety guarantees.
 ### Key Features
 
 - 🎮 **Cross-Device Consistency**: Unified data format transformation across heterogeneous input sources (VR, haptic controllers, isomorphic arms)
@@ -68,11 +67,6 @@ UniBiDex/
 
 - **OS**: Ubuntu 22.04 (recommended)
 - **Python**: ≥ 3.8
-- **Hardware**: 
-  - **Follower**: Dual XArm7 robotic arms (UFactory)
-  - **Leader**: Custom UniBiDex haptic devices with Dynamixel servos
-  - **Grippers**: Robotiq 2F-85 grippers (optional but recommended)
-  - **Cameras**: Multi-view RGB cameras for visual feedback
 - **Dependencies**: ROS2 Humble, MuJoCo ≥ 3.0, OpenCV, NumPy, Dynamixel SDK
 
 ### Basic Setup
@@ -86,15 +80,6 @@ UniBiDex/
    pip install -e .
    pip install -e third_party/DynamixelSDK/python
    cd unibidex_client && pip install -e . && cd ..
-   ```
-
-2. **Test installation**
-   ```bash
-   # Test with mock devices (no hardware required)
-   python scripts/main.py --mock --verbose
-   
-   # Test robot control (requires XArm7)
-   cd unibidex_client && python tests/test_xarm7.py
    ```
 
 3. **Run simulation**
@@ -223,26 +208,6 @@ Edit configuration files in `unibidex_client/configs/`:
 
 ---
 
-## 🧪 Experiments
-
-### Bimanual Manipulation Benchmarks
-
-Our framework has been validated on a comprehensive set of bimanual kitchen tidying tasks that require varying degrees of coordination:
-
-#### Task Categories
-- **Contact-Rich Manipulation**: Tasks requiring precise force control and tactile feedback
-- **Coordination-Heavy Tasks**: Complex bimanual coordination patterns
-- **Dexterous Assembly**: Fine motor skills for assembly operations  
-- **Kitchen Scenarios**: Real-world domestic manipulation tasks
-
-#### Evaluation Metrics
-- Task completion rates across different modalities (VR vs UniBiDex)
-- Motion smoothness and efficiency
-- Force/torque profiles during contact
-- User fatigue and learning curves
-
----
-
 ## 📝 Citation
 
 If you find UniBiDex useful in your research, please cite our paper:
@@ -257,7 +222,6 @@ If you find UniBiDex useful in your research, please cite our paper:
 ```
 
 ---
-
 
 ## 📞 Support
 
