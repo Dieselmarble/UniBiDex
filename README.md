@@ -59,7 +59,7 @@ UniBiDex/
 
 ## 🛠️ Configuration
 
-#### Camera Configuration
+#### Camera Configuration (If using data recording)
 ```bash
 # Set up camera rules for consistent device naming
 cd unibidex_client
