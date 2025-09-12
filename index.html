@@ -76,6 +76,17 @@
                 <p>
                     The framework integrates heterogeneous input devices into a shared control stack with consistent kinematic treatment. The name "UniBiDex" reflects two core principles: <strong>universal device support</strong> (any input modality can be integrated) and <strong>unified constraint handling</strong> (all safety and task-related constraints are enforced through a single bimanual control module). The overall architecture consists of four decoupled modules: <em>input preprocessing</em>, <em>motion retargeting</em>, <em>bimanual motion control</em>, and <em>haptic feedback</em>.
                 </p>
+                
+                <div style="display: flex; gap: 30px; align-items: center; margin: 20px 0;">
+                    <div style="flex: 1;">
+                        <p>
+                            Human commands are first smooth-filtered and converted to robot end-effector motions under the robot's base frame. During teleoperation, null-space control utilizes predefined optimal poses to maintain safe bimanual configurations. The system guides the robot towards biomechanically favorable poses, avoiding joint limits, singularities, and inter-arm collisions, while tracking complex end-effector trajectories. Haptic feedback enhances user experience and safety by providing force feedback when the robot nears workspace boundaries or encounters resistance.
+                        </p>
+                    </div>
+                    <div style="flex: 1;">
+                        <img src="assets/images/optimal_configurations.png" alt="Optimal Configurations for Null Space Control" style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+                    </div>
+                </div>
             </div>
         </section>
 
